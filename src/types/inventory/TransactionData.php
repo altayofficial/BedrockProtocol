@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types\inventory;
 
+use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\DataDecodeException;
 use pmmp\encoding\VarInt;
-use pmmp\encoding\Byte;
 use pocketmine\network\mcpe\protocol\PacketDecodeException;
 use function count;
 

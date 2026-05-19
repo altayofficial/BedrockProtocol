@@ -44,7 +44,6 @@ class InventoryTransactionPacket extends DataPacket implements ClientboundPacket
 	public array $requestChangedSlots;
 	/** @var integer */
 	public int $transactionCount = 1;
-	/** @var TransactionData */
 	public TransactionData $trData;
 
 	/**
