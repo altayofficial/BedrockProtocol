@@ -590,5 +590,13 @@ final class LevelSoundEvent{
 	public const RESET_GROWTH = 598;
 	public const PUSHED_BY_PLAYER = 599;
 	public const BOUNCE = 600;
+	public const SLIME_LANDING = 601;
+	public const ABSORB_BLOCK = 602;
+	public const EJECT_BLOCK = 603;
+	public const GEYSER_ERUPTION_START = 604;
+	public const GEYSER_ERUPTION_ACTIVE = 605;
+	public const RECORD_BOUNCE = 606;
+	public const BUCKET_FILL_LAND_ANIMAL = 607;
+	public const BUCKET_EMPTY_LAND_ANIMAL = 608;
 
 }

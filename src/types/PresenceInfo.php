@@ -23,24 +23,30 @@ final class PresenceInfo{
 	public function __construct(
 		private string $experienceName,
 		private string $worldName,
+		private string $richPresenceId,
 	){}
 
 	public function getExperienceName() : string{ return $this->experienceName; }
 
 	public function getWorldName() : string{ return $this->worldName; }
 
+	public function getRichPresenceId() : string{ return $this->richPresenceId; }
+
 	public static function read(ByteBufferReader $in) : self{
 		$experienceName = CommonTypes::getString($in);
 		$worldName = CommonTypes::getString($in);
+		$richPresenceId = CommonTypes::getString($in);
 
 		return new self(
 			$experienceName,
 			$worldName,
+			$richPresenceId,
 		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
 		CommonTypes::putString($out, $this->experienceName);
 		CommonTypes::putString($out, $this->worldName);
+		CommonTypes::putString($out, $this->richPresenceId);
 	}
 }

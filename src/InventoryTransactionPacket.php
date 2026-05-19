@@ -42,6 +42,9 @@ class InventoryTransactionPacket extends DataPacket implements ClientboundPacket
 	public int $requestId;
 	/** @var InventoryTransactionChangedSlotsHack[] */
 	public array $requestChangedSlots;
+	/** @var integer */
+	public int $transactionCount = 1;
+	/** @var TransactionData */
 	public TransactionData $trData;
 
 	/**
@@ -58,12 +61,15 @@ class InventoryTransactionPacket extends DataPacket implements ClientboundPacket
 
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$this->requestId = CommonTypes::readLegacyItemStackRequestId($in);
+		$hasLegacySetSlots = CommonTypes::getBool($in);
 		$this->requestChangedSlots = [];
-		if($this->requestId !== 0){
+		if($hasLegacySetSlots){
 			for($i = 0, $len = VarInt::readUnsignedInt($in); $i < $len; ++$i){
 				$this->requestChangedSlots[] = InventoryTransactionChangedSlotsHack::read($in);
 			}
 		}
+
+		$this->transactionCount = VarInt::readUnsignedInt($in);
 
 		$transactionType = VarInt::readUnsignedInt($in);
 
@@ -81,12 +87,16 @@ class InventoryTransactionPacket extends DataPacket implements ClientboundPacket
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
 		CommonTypes::writeLegacyItemStackRequestId($out, $this->requestId);
-		if($this->requestId !== 0){
+		$hasLegacySetSlots = count($this->requestChangedSlots) > 0;
+		CommonTypes::putBool($out, $hasLegacySetSlots);
+		if($hasLegacySetSlots){
 			VarInt::writeUnsignedInt($out, count($this->requestChangedSlots));
 			foreach($this->requestChangedSlots as $changedSlots){
 				$changedSlots->write($out);
 			}
 		}
+
+		VarInt::writeUnsignedInt($out, $this->transactionCount);
 
 		VarInt::writeUnsignedInt($out, $this->trData->getTypeId());
 

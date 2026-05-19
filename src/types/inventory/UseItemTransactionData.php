@@ -86,9 +86,9 @@ class UseItemTransactionData extends TransactionData{
 
 	protected function decodeData(ByteBufferReader $in) : void{
 		$this->actionType = VarInt::readUnsignedInt($in);
-		$this->triggerType = TriggerType::fromPacket(VarInt::readUnsignedInt($in));
+		$this->triggerType = TriggerType::fromPacket(Byte::readUnsigned($in));
 		$this->blockPosition = CommonTypes::getBlockPosition($in);
-		$this->face = VarInt::readSignedInt($in);
+		$this->face = Byte::readSigned($in);
 		$this->hotbarSlot = VarInt::readSignedInt($in);
 		$this->itemInHand = CommonTypes::getItemStackWrapper($in);
 		$this->playerPosition = CommonTypes::getVector3($in);
@@ -100,9 +100,9 @@ class UseItemTransactionData extends TransactionData{
 
 	protected function encodeData(ByteBufferWriter $out) : void{
 		VarInt::writeUnsignedInt($out, $this->actionType);
-		VarInt::writeUnsignedInt($out, $this->triggerType->value);
+		Byte::writeUnsigned($out, $this->triggerType->value);
 		CommonTypes::putBlockPosition($out, $this->blockPosition);
-		VarInt::writeSignedInt($out, $this->face);
+		Byte::writeSigned($out, $this->face);
 		VarInt::writeSignedInt($out, $this->hotbarSlot);
 		CommonTypes::putItemStackWrapper($out, $this->itemInHand);
 		CommonTypes::putVector3($out, $this->playerPosition);

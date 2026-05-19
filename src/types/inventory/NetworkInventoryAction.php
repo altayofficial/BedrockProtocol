@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types\inventory;
 
+use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\DataDecodeException;
@@ -24,12 +25,13 @@ use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 class NetworkInventoryAction{
 	public const SOURCE_CONTAINER = 0;
 
+	public const SOURCE_GLOBAL = 1;
 	public const SOURCE_WORLD = 2; //drop/pickup item entity
 	public const SOURCE_CREATIVE = 3;
-	public const SOURCE_TODO = 99999;
+	public const SOURCE_TODO = 4;
 
 	/**
-	 * Fake window IDs for the SOURCE_TODO type (99999)
+	 * Fake window IDs for the SOURCE_TODO type (4)
 	 *
 	 * These identifiers are used for inventory source types which are not currently implemented server-side in MCPE.
 	 * As a general rule of thumb, anything that doesn't have a permanent inventory is client-side. These types are
@@ -59,7 +61,7 @@ class NetworkInventoryAction{
 	public const ACTION_MAGIC_SLOT_PICKUP_ITEM = 1;
 
 	public int $sourceType;
-	public int $windowId;
+	public int $windowId = -1;
 	public int $sourceFlags = 0;
 	public int $inventorySlot;
 	public ItemStackWrapper $oldItem;
@@ -73,26 +75,21 @@ class NetworkInventoryAction{
 	 */
 	public function read(ByteBufferReader $in) : NetworkInventoryAction{
 		$this->sourceType = VarInt::readUnsignedInt($in);
-
-		switch($this->sourceType){
-			case self::SOURCE_CONTAINER:
-				$this->windowId = VarInt::readSignedInt($in);
-				break;
-			case self::SOURCE_WORLD:
-				$this->sourceFlags = VarInt::readUnsignedInt($in);
-				break;
-			case self::SOURCE_CREATIVE:
-				break;
-			case self::SOURCE_TODO:
-				$this->windowId = VarInt::readSignedInt($in);
-				break;
-			default:
-				throw new PacketDecodeException("Unknown inventory action source type $this->sourceType");
+		Byte::readUnsigned($in); // has value, always 1
+		$variant = VarInt::readUnsignedInt($in);
+		if($variant === 1){
+			$this->windowId = Byte::readSigned($in);
+			$this->sourceFlags = 0;
+		} else {
+			$this->windowId = -1;
+			$this->sourceFlags = VarInt::readUnsignedInt($in);
 		}
+		Byte::readUnsigned($in); // always 1
+		Byte::readUnsigned($in); // always 0
 
 		$this->inventorySlot = VarInt::readUnsignedInt($in);
-		$this->oldItem = CommonTypes::getItemStackWrapper($in);
-		$this->newItem = CommonTypes::getItemStackWrapper($in);
+		$this->oldItem = CommonTypes::getNetworkItemStackDescriptor($in);
+		$this->newItem = CommonTypes::getNetworkItemStackDescriptor($in);
 
 		return $this;
 	}
@@ -102,25 +99,29 @@ class NetworkInventoryAction{
 	 */
 	public function write(ByteBufferWriter $out) : void{
 		VarInt::writeUnsignedInt($out, $this->sourceType);
+		Byte::writeUnsigned($out, 1); // has value
 
 		switch($this->sourceType){
 			case self::SOURCE_CONTAINER:
-				VarInt::writeSignedInt($out, $this->windowId);
+			case self::SOURCE_TODO:
+				VarInt::writeUnsignedInt($out, 1); // variant = has containerId
+				Byte::writeSigned($out, $this->windowId);
 				break;
 			case self::SOURCE_WORLD:
+				VarInt::writeUnsignedInt($out, 0); // variant = has flags
 				VarInt::writeUnsignedInt($out, $this->sourceFlags);
 				break;
-			case self::SOURCE_CREATIVE:
-				break;
-			case self::SOURCE_TODO:
-				VarInt::writeSignedInt($out, $this->windowId);
-				break;
 			default:
-				throw new \InvalidArgumentException("Unknown inventory action source type $this->sourceType");
+				VarInt::writeUnsignedInt($out, 0); // variant = no containerId
+				VarInt::writeUnsignedInt($out, 0); // no flags
+				break;
 		}
 
+		Byte::writeUnsigned($out, 1);
+		Byte::writeUnsigned($out, 0);
+
 		VarInt::writeUnsignedInt($out, $this->inventorySlot);
-		CommonTypes::putItemStackWrapper($out, $this->oldItem);
-		CommonTypes::putItemStackWrapper($out, $this->newItem);
+		CommonTypes::putNetworkItemStackDescriptor($out, $this->oldItem);
+		CommonTypes::putNetworkItemStackDescriptor($out, $this->newItem);
 	}
 }
