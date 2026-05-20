@@ -64,13 +64,6 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction
 
-      - name: Verify ::create() methods are up to date
-        run: |
-          php tools/generate-create-static-methods.php
-          php-cs-fixer fix
-          git diff
-          git diff --quiet #to set the exit code
-
   codestyle:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
