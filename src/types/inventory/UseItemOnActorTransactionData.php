@@ -22,7 +22,7 @@ use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\GetTypeIdFromConstTrait;
 
-class UseItemOnEntityTransactionData extends TransactionData{
+class UseItemOnActorTransactionData extends TransactionData{
 	use GetTypeIdFromConstTrait;
 
 	public const ID = InventoryTransactionPacket::TYPE_USE_ITEM_ON_ENTITY;

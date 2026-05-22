@@ -23,7 +23,7 @@ use pocketmine\network\mcpe\protocol\types\inventory\MismatchTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\NormalTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\ReleaseItemTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\TransactionData;
-use pocketmine\network\mcpe\protocol\types\inventory\UseItemOnEntityTransactionData;
+use pocketmine\network\mcpe\protocol\types\inventory\UseItemOnActorTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemTransactionData;
 use function count;
 
@@ -76,7 +76,7 @@ class InventoryTransactionPacket extends DataPacket implements ClientboundPacket
 			NormalTransactionData::ID => new NormalTransactionData(),
 			MismatchTransactionData::ID => new MismatchTransactionData(),
 			UseItemTransactionData::ID => new UseItemTransactionData(),
-			UseItemOnEntityTransactionData::ID => new UseItemOnEntityTransactionData(),
+			UseItemOnActorTransactionData::ID => new UseItemOnActorTransactionData(),
 			ReleaseItemTransactionData::ID => new ReleaseItemTransactionData(),
 			default => throw new PacketDecodeException("Unknown transaction type $transactionType"),
 		};
