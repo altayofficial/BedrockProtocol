@@ -52,7 +52,6 @@ class BossEventPacket extends DataPacket implements ClientboundPacket, Serverbou
 	public float $healthPercent;
 	public string $title;
 	public string $filteredTitle;
-	public bool $darkenScreen;
 	public int $color;
 	public int $overlay;
 
@@ -63,12 +62,11 @@ class BossEventPacket extends DataPacket implements ClientboundPacket, Serverbou
 		return $result;
 	}
 
-	public static function show(int $bossActorUniqueId, string $title, float $healthPercent, bool $darkenScreen = false, int $color = BossBarColor::PURPLE, int $overlay = BossBarOverlay::PROGRESS) : self{
+	public static function show(int $bossActorUniqueId, string $title, float $healthPercent, int $color = BossBarColor::PURPLE, int $overlay = BossBarOverlay::PROGRESS) : self{
 		$result = self::base($bossActorUniqueId, self::TYPE_SHOW);
 		$result->title = $title;
 		$result->filteredTitle = $title;
 		$result->healthPercent = $healthPercent;
-		$result->darkenScreen = $darkenScreen;
 		$result->color = $color;
 		$result->overlay = $overlay;
 		return $result;
@@ -103,9 +101,8 @@ class BossEventPacket extends DataPacket implements ClientboundPacket, Serverbou
 		return $result;
 	}
 
-	public static function properties(int $bossActorUniqueId, bool $darkenScreen, int $color = BossBarColor::PURPLE, int $overlay = BossBarOverlay::PROGRESS) : self{
+	public static function properties(int $bossActorUniqueId, int $color = BossBarColor::PURPLE, int $overlay = BossBarOverlay::PROGRESS) : self{
 		$result = self::base($bossActorUniqueId, self::TYPE_PROPERTIES);
-		$result->darkenScreen = $darkenScreen;
 		$result->color = $color;
 		$result->overlay = $overlay;
 		return $result;
@@ -124,11 +121,6 @@ class BossEventPacket extends DataPacket implements ClientboundPacket, Serverbou
 		$this->title = CommonTypes::getString($in);
 		$this->filteredTitle = CommonTypes::getString($in);
 		$this->healthPercent = LE::readFloat($in);
-		$this->darkenScreen = match($raw = LE::readUnsignedShort($in)){
-					0 => false,
-					1 => true,
-					default => throw new PacketDecodeException("Invalid darkenScreen value $raw"),
-		};
 		$this->color = VarInt::readUnsignedInt($in);
 		$this->overlay = VarInt::readUnsignedInt($in);
 	}
@@ -140,7 +132,6 @@ class BossEventPacket extends DataPacket implements ClientboundPacket, Serverbou
 		CommonTypes::putString($out, $this->title);
 		CommonTypes::putString($out, $this->filteredTitle);
 		LE::writeFloat($out, $this->healthPercent);
-		LE::writeUnsignedShort($out, $this->darkenScreen ? 1 : 0);
 		VarInt::writeUnsignedInt($out, $this->color);
 		VarInt::writeUnsignedInt($out, $this->overlay);
 	}
