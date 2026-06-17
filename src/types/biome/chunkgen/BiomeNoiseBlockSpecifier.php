@@ -19,35 +19,47 @@ use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
-final class SerializedNoiseBlockSpecifier{
+final class BiomeNoiseBlockSpecifier{
 
 	public function __construct(
 		private string $noise,
 		private float $threshold,
-		private FloatRange $range,
-		private int $block
+		private float $min,
+		private float $max,
+		private int $block,
 	){}
 
 	public function getNoise() : string{ return $this->noise; }
 
 	public function getThreshold() : float{ return $this->threshold; }
 
-	public function getRange() : FloatRange{ return $this->range; }
+	public function getMin() : float{ return $this->min; }
+
+	public function getMax() : float{ return $this->max; }
 
 	public function getBlock() : int{ return $this->block; }
 
 	public static function read(ByteBufferReader $in) : self{
 		$noise = CommonTypes::getString($in);
 		$threshold = LE::readFloat($in);
-		$range = FloatRange::read($in);
+		$min = LE::readFloat($in);
+		$max = LE::readFloat($in);
 		$block = LE::readUnsignedInt($in);
-		return new self($noise, $threshold, $range, $block);
+
+		return new self(
+			$noise,
+			$threshold,
+			$min,
+			$max,
+			$block
+		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
 		CommonTypes::putString($out, $this->noise);
 		LE::writeFloat($out, $this->threshold);
-		$this->range->write($out);
+		LE::writeFloat($out, $this->min);
+		LE::writeFloat($out, $this->max);
 		LE::writeUnsignedInt($out, $this->block);
 	}
 }

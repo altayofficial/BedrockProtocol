@@ -18,7 +18,6 @@ use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
-use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\BossBarColor;
 use pocketmine\network\mcpe\protocol\types\BossBarOverlay;
@@ -116,24 +115,24 @@ class BossEventPacket extends DataPacket implements ClientboundPacket, Serverbou
 
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$this->bossActorUniqueId = CommonTypes::getActorUniqueId($in);
-		$this->eventType = Byte::readUnsigned($in);
 		$this->playerActorUniqueId = CommonTypes::getActorUniqueId($in);
+		$this->eventType = Byte::readUnsigned($in);
 		$this->title = CommonTypes::getString($in);
 		$this->filteredTitle = CommonTypes::getString($in);
 		$this->healthPercent = LE::readFloat($in);
-		$this->color = VarInt::readUnsignedInt($in);
-		$this->overlay = VarInt::readUnsignedInt($in);
+		$this->color = Byte::readUnsigned($in);
+		$this->overlay = Byte::readUnsigned($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
 		CommonTypes::putActorUniqueId($out, $this->bossActorUniqueId);
-		Byte::writeUnsigned($out, $this->eventType);
 		CommonTypes::putActorUniqueId($out, $this->playerActorUniqueId);
+		Byte::writeUnsigned($out, $this->eventType);
 		CommonTypes::putString($out, $this->title);
 		CommonTypes::putString($out, $this->filteredTitle);
 		LE::writeFloat($out, $this->healthPercent);
-		VarInt::writeUnsignedInt($out, $this->color);
-		VarInt::writeUnsignedInt($out, $this->overlay);
+		Byte::writeUnsigned($out, $this->color);
+		Byte::writeUnsigned($out, $this->overlay);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

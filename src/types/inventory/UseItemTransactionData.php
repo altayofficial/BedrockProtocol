@@ -88,13 +88,13 @@ class UseItemTransactionData extends TransactionData{
 		$this->actionType = VarInt::readUnsignedInt($in);
 		$this->triggerType = TriggerType::fromPacket(Byte::readUnsigned($in));
 		$this->blockPosition = CommonTypes::getBlockPosition($in);
-		$this->face = Byte::readSigned($in);
+		$this->face = Byte::readUnsigned($in);
 		$this->hotbarSlot = VarInt::readSignedInt($in);
 		$this->itemInHand = CommonTypes::getNetworkItemStackDescriptor($in);
 		$this->playerPosition = CommonTypes::getVector3($in);
 		$this->clickPosition = CommonTypes::getVector3($in);
 		$this->blockRuntimeId = VarInt::readUnsignedInt($in);
-		$this->clientInteractPrediction = PredictedResult::fromPacket(VarInt::readUnsignedInt($in));
+		$this->clientInteractPrediction = PredictedResult::fromPacket(Byte::readUnsigned($in));
 		$this->clientCooldownState = Byte::readUnsigned($in);
 	}
 
@@ -102,13 +102,13 @@ class UseItemTransactionData extends TransactionData{
 		VarInt::writeUnsignedInt($out, $this->actionType);
 		Byte::writeUnsigned($out, $this->triggerType->value);
 		CommonTypes::putBlockPosition($out, $this->blockPosition);
-		Byte::writeSigned($out, $this->face);
+		Byte::writeUnsigned($out, $this->face);
 		VarInt::writeSignedInt($out, $this->hotbarSlot);
 		CommonTypes::putNetworkItemStackDescriptor($out, $this->itemInHand);
 		CommonTypes::putVector3($out, $this->playerPosition);
 		CommonTypes::putVector3($out, $this->clickPosition);
 		VarInt::writeUnsignedInt($out, $this->blockRuntimeId);
-		VarInt::writeUnsignedInt($out, $this->clientInteractPrediction->value);
+		Byte::writeUnsigned($out, $this->clientInteractPrediction->value);
 		Byte::writeUnsigned($out, $this->clientCooldownState);
 	}
 

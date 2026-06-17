@@ -18,18 +18,22 @@ use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
 use pmmp\encoding\VarInt;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use function count;
 
 final class BiomeNoiseGradientSurfaceData{
 
 	/**
-	 * @param int[]                          $nonReplaceableBlocks
-	 * @param SerializedNoiseBlockSpecifier[] $gradientBlocks
+	 * @param int[]   					   $nonReplaceableBlocks
+	 * @param BiomeNoiseBlockSpecifier[]   $gradientBlocks
+	 * @param float[] 					   $amplitudes
 	 */
 	public function __construct(
 		private array $nonReplaceableBlocks,
 		private array $gradientBlocks,
-		private NoiseDescriptor $noise
+		private string $noiseSeed,
+		private int $firstOctave,
+		private array $amplitudes
 	){}
 
 	/**
@@ -38,11 +42,18 @@ final class BiomeNoiseGradientSurfaceData{
 	public function getNonReplaceableBlocks() : array{ return $this->nonReplaceableBlocks; }
 
 	/**
-	 * @return SerializedNoiseBlockSpecifier[]
+	 * @return BiomeNoiseBlockSpecifier[]
 	 */
 	public function getGradientBlocks() : array{ return $this->gradientBlocks; }
 
-	public function getNoise() : NoiseDescriptor{ return $this->noise; }
+	public function getNoiseSeed() : string{ return $this->noiseSeed; }
+
+	public function getFirstOctave() : int{ return $this->firstOctave; }
+
+	/**
+	 * @return float[]
+	 */
+	public function getAmplitudes() : array{ return $this->amplitudes; }
 
 	public static function read(ByteBufferReader $in) : self{
 		$nonReplaceableBlocks = [];
@@ -52,12 +63,24 @@ final class BiomeNoiseGradientSurfaceData{
 
 		$gradientBlocks = [];
 		for($i = 0, $count = VarInt::readUnsignedInt($in); $i < $count; ++$i){
-			$gradientBlocks[] = SerializedNoiseBlockSpecifier::read($in);
+			$gradientBlocks[] = BiomeNoiseBlockSpecifier::read($in);
 		}
 
-		$noise = NoiseDescriptor::read($in);
+		$noiseSeed = CommonTypes::getString($in);
+		$firstOctave = LE::readUnsignedInt($in);
 
-		return new self($nonReplaceableBlocks, $gradientBlocks, $noise);
+		$amplitudes = [];
+		for($i = 0, $count = VarInt::readUnsignedInt($in); $i < $count; ++$i){
+			$amplitudes[] = LE::readFloat($in);
+		}
+
+		return new self(
+			$nonReplaceableBlocks,
+			$gradientBlocks,
+			$noiseSeed,
+			$firstOctave,
+			$amplitudes
+		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
@@ -67,10 +90,16 @@ final class BiomeNoiseGradientSurfaceData{
 		}
 
 		VarInt::writeUnsignedInt($out, count($this->gradientBlocks));
-		foreach($this->gradientBlocks as $specifier){
-			$specifier->write($out);
+		foreach($this->gradientBlocks as $value){
+			$value->write($out);
 		}
 
-		$this->noise->write($out);
+		CommonTypes::putString($out, $this->noiseSeed);
+		LE::writeUnsignedInt($out, $this->firstOctave);
+
+		VarInt::writeUnsignedInt($out, count($this->amplitudes));
+		foreach($this->amplitudes as $value){
+			LE::writeFloat($out, $value);
+		}
 	}
 }

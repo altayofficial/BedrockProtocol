@@ -12,31 +12,28 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types\biome\chunkgen;
+namespace pocketmine\network\mcpe\protocol\types;
 
+use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\LE;
 
-final class FloatRange{
+final class PrimitiveShapeCircleOrSpherePayload extends PrimitiveShapePayload{
+	use GetTypeIdFromConstTrait;
+
+	public const ID = PrimitiveShapeType::PAYLOAD_TYPE_CIRCLE_OR_SPHERE;
 
 	public function __construct(
-		private float $min,
-		private float $max
+		private int $segments,
 	){}
 
-	public function getMin() : float{ return $this->min; }
-
-	public function getMax() : float{ return $this->max; }
+	public function getSegments() : int{ return $this->segments; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$min = LE::readFloat($in);
-		$max = LE::readFloat($in);
-		return new self($min, $max);
+		return new self(Byte::readUnsigned($in));
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		LE::writeFloat($out, $this->min);
-		LE::writeFloat($out, $this->max);
+		Byte::writeUnsigned($out, $this->segments);
 	}
 }

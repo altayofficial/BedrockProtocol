@@ -28,10 +28,10 @@ class NetworkInventoryAction{
 	public const SOURCE_GLOBAL = 1;
 	public const SOURCE_WORLD = 2; //drop/pickup item entity
 	public const SOURCE_CREATIVE = 3;
-	public const SOURCE_TODO = 4;
+	public const SOURCE_TODO = 99999;
 
 	/**
-	 * Fake window IDs for the SOURCE_TODO type (4)
+	 * Fake window IDs for the SOURCE_TODO type (99999)
 	 *
 	 * These identifiers are used for inventory source types which are not currently implemented server-side in MCPE.
 	 * As a general rule of thumb, anything that doesn't have a permanent inventory is client-side. These types are
@@ -61,8 +61,8 @@ class NetworkInventoryAction{
 	public const ACTION_MAGIC_SLOT_PICKUP_ITEM = 1;
 
 	public int $sourceType;
-	public int $windowId = -1;
-	public int $sourceFlags = 0;
+	public ?int $windowId;
+	public ?int $sourceFlags = 0;
 	public int $inventorySlot;
 	public ItemStackWrapper $oldItem;
 	public ItemStackWrapper $newItem;
@@ -75,18 +75,8 @@ class NetworkInventoryAction{
 	 */
 	public function read(ByteBufferReader $in) : NetworkInventoryAction{
 		$this->sourceType = VarInt::readUnsignedInt($in);
-		Byte::readUnsigned($in); // has value, always 1
-		$variant = VarInt::readUnsignedInt($in);
-		if($variant === 1){
-			$this->windowId = Byte::readSigned($in);
-			$this->sourceFlags = 0;
-		} else {
-			$this->windowId = -1;
-			$this->sourceFlags = VarInt::readUnsignedInt($in);
-		}
-		Byte::readUnsigned($in); // always 1
-		Byte::readUnsigned($in); // always 0
-
+		$this->windowId = CommonTypes::readOptional($in, fn(ByteBufferReader $in) => CommonTypes::readOptional($in, Byte::readSigned(...)));
+		$this->sourceFlags = CommonTypes::readOptional($in, fn(ByteBufferReader $in) => CommonTypes::readOptional($in, VarInt::readUnsignedInt(...)));
 		$this->inventorySlot = VarInt::readUnsignedInt($in);
 		$this->oldItem = CommonTypes::getNetworkItemStackDescriptor($in);
 		$this->newItem = CommonTypes::getNetworkItemStackDescriptor($in);
@@ -99,27 +89,8 @@ class NetworkInventoryAction{
 	 */
 	public function write(ByteBufferWriter $out) : void{
 		VarInt::writeUnsignedInt($out, $this->sourceType);
-		Byte::writeUnsigned($out, 1); // has value
-
-		switch($this->sourceType){
-			case self::SOURCE_CONTAINER:
-			case self::SOURCE_TODO:
-				VarInt::writeUnsignedInt($out, 1); // variant = has containerId
-				Byte::writeSigned($out, $this->windowId);
-				break;
-			case self::SOURCE_WORLD:
-				VarInt::writeUnsignedInt($out, 0); // variant = has flags
-				VarInt::writeUnsignedInt($out, $this->sourceFlags);
-				break;
-			default:
-				VarInt::writeUnsignedInt($out, 0); // variant = no containerId
-				VarInt::writeUnsignedInt($out, 0); // no flags
-				break;
-		}
-
-		Byte::writeUnsigned($out, 1);
-		Byte::writeUnsigned($out, 0);
-
+		CommonTypes::writeOptional($out, $this->windowId, fn(ByteBufferWriter $out, int $windowId) => CommonTypes::writeOptional($out, $windowId, Byte::writeSigned(...)));
+		CommonTypes::writeOptional($out, $this->sourceFlags, fn(ByteBufferWriter $out, int $sourceFlags) => CommonTypes::writeOptional($out, $sourceFlags, VarInt::writeUnsignedInt(...)));
 		VarInt::writeUnsignedInt($out, $this->inventorySlot);
 		CommonTypes::putNetworkItemStackDescriptor($out, $this->oldItem);
 		CommonTypes::putNetworkItemStackDescriptor($out, $this->newItem);
