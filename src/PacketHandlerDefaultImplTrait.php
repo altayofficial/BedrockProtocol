@@ -925,4 +925,16 @@ trait PacketHandlerDefaultImplTrait{
 	public function handleServerStoreInfo(ServerStoreInfoPacket $packet) : bool{
 		return false;
 	}
+
+	public function handleClientboundUpdateSoundData(ClientboundUpdateSoundDataPacket $packet) : bool{
+		return false;
+	}
+
+	public function handleSendPartyDestinationCookie(SendPartyDestinationCookiePacket $packet) : bool{
+		return false;
+	}
+
+	public function handlePartyDestinationCookieResponse(PartyDestinationCookieResponsePacket $packet) : bool{
+		return false;
+	}
 }

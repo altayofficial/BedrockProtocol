@@ -61,6 +61,7 @@ class StartGamePacket extends DataPacket implements ClientboundPacket{
 	public UuidInterface $worldTemplateId; //why is this here twice ??? mojang
 	public bool $enableClientSideChunkGeneration;
 	public bool $blockNetworkIdsAreHashes = false; //new in 1.19.80, possibly useful for multi version
+	public bool $isLoggingChat = false;
 	public NetworkPermissions $networkPermissions;
 	public ?ServerJoinInformation $serverJoinInformation;
 	public ServerTelemetryData $serverTelemetryData;
@@ -106,6 +107,7 @@ class StartGamePacket extends DataPacket implements ClientboundPacket{
 		UuidInterface $worldTemplateId,
 		bool $enableClientSideChunkGeneration,
 		bool $blockNetworkIdsAreHashes,
+		bool $isLoggingChat,
 		NetworkPermissions $networkPermissions,
 		?ServerJoinInformation $serverJoinInformation,
 		ServerTelemetryData $serverTelemetryData,
@@ -134,6 +136,7 @@ class StartGamePacket extends DataPacket implements ClientboundPacket{
 		$result->worldTemplateId = $worldTemplateId;
 		$result->enableClientSideChunkGeneration = $enableClientSideChunkGeneration;
 		$result->blockNetworkIdsAreHashes = $blockNetworkIdsAreHashes;
+		$result->isLoggingChat = $isLoggingChat;
 		$result->networkPermissions = $networkPermissions;
 		$result->serverJoinInformation = $serverJoinInformation;
 		$result->serverTelemetryData = $serverTelemetryData;
@@ -178,6 +181,7 @@ class StartGamePacket extends DataPacket implements ClientboundPacket{
 		$this->worldTemplateId = CommonTypes::getUUID($in);
 		$this->enableClientSideChunkGeneration = CommonTypes::getBool($in);
 		$this->blockNetworkIdsAreHashes = CommonTypes::getBool($in);
+		$this->isLoggingChat = CommonTypes::getBool($in);
 		$this->networkPermissions = NetworkPermissions::decode($in);
 		$this->serverJoinInformation = CommonTypes::readOptional($in, ServerJoinInformation::read(...));
 		$this->serverTelemetryData = ServerTelemetryData::read($in);
@@ -218,6 +222,7 @@ class StartGamePacket extends DataPacket implements ClientboundPacket{
 		CommonTypes::putUUID($out, $this->worldTemplateId);
 		CommonTypes::putBool($out, $this->enableClientSideChunkGeneration);
 		CommonTypes::putBool($out, $this->blockNetworkIdsAreHashes);
+		CommonTypes::putBool($out, $this->isLoggingChat);
 		$this->networkPermissions->encode($out);
 		CommonTypes::writeOptional($out, $this->serverJoinInformation, fn(ByteBufferWriter $out, ServerJoinInformation $info) => $info->write($out));
 		$this->serverTelemetryData->write($out);
