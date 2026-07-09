@@ -1,5 +1,5 @@
 {
-    "name": "zenith/bedrock-protocol",
+    "name": "altayofficial/bedrock-protocol",
     "description": "An implementation of the Minecraft: Bedrock Edition protocol in PHP",
     "type": "library",
     "require": {
