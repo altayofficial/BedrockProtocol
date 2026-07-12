@@ -23,7 +23,7 @@ class PlayerListEntry{
 	public UuidInterface $uuid;
 	public int $actorUniqueId;
 	public string $username;
-	public SkinData $skinData;
+	public ?SkinData $skinData = null;
 	public string $xboxUserId;
 	public string $platformChatId = "";
 	public int $buildPlatform = DeviceOS::UNKNOWN;

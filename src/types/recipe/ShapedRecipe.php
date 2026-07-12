@@ -20,7 +20,9 @@ use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\inventory\ItemStack;
 use Ramsey\Uuid\UuidInterface;
+use function array_chunk;
 use function count;
+use function max;
 
 final class ShapedRecipe extends RecipeWithTypeId{
 	private string $blockName;
@@ -40,7 +42,7 @@ final class ShapedRecipe extends RecipeWithTypeId{
 		string $blockType, //TODO: rename this
 		private int $priority,
 		private bool $symmetric,
-		private RecipeUnlockingRequirement $unlockingRequirement,
+		private ?RecipeUnlockingRequirement $unlockingRequirement,
 		private int $recipeNetId
 	){
 		parent::__construct($typeId);
@@ -101,7 +103,7 @@ final class ShapedRecipe extends RecipeWithTypeId{
 
 	public function isSymmetric() : bool{ return $this->symmetric; }
 
-	public function getUnlockingRequirement() : RecipeUnlockingRequirement{ return $this->unlockingRequirement; }
+	public function getUnlockingRequirement() : ?RecipeUnlockingRequirement{ return $this->unlockingRequirement; }
 
 	public function getRecipeNetId() : int{
 		return $this->recipeNetId;
@@ -111,12 +113,11 @@ final class ShapedRecipe extends RecipeWithTypeId{
 		$recipeId = CommonTypes::getString($in);
 		$width = VarInt::readSignedInt($in);
 		$height = VarInt::readSignedInt($in);
-		$input = [];
-		for($row = 0; $row < $height; ++$row){
-			for($column = 0; $column < $width; ++$column){
-				$input[$row][$column] = CommonTypes::getRecipeIngredient($in);
-			}
+		$ingredients = [];
+		for($i = 0, $ingredientCount = VarInt::readUnsignedInt($in); $i < $ingredientCount; ++$i){
+			$ingredients[] = RecipeIngredient::read($in);
 		}
+		$input = array_chunk($ingredients, max(1, $width));
 
 		$output = [];
 		for($k = 0, $resultCount = VarInt::readUnsignedInt($in); $k < $resultCount; ++$k){
@@ -126,9 +127,9 @@ final class ShapedRecipe extends RecipeWithTypeId{
 		$block = CommonTypes::getString($in);
 		$priority = VarInt::readSignedInt($in);
 		$symmetric = CommonTypes::getBool($in);
-		$unlockingRequirement = RecipeUnlockingRequirement::read($in);
+		$unlockingRequirement = CommonTypes::getBool($in) ? RecipeUnlockingRequirement::read($in) : null;
 
-		$recipeNetId = CommonTypes::readRecipeNetId($in);
+		$recipeNetId = VarInt::readSignedInt($in);
 
 		return new self($recipeType, $recipeId, $input, $output, $uuid, $block, $priority, $symmetric, $unlockingRequirement, $recipeNetId);
 	}
@@ -137,9 +138,10 @@ final class ShapedRecipe extends RecipeWithTypeId{
 		CommonTypes::putString($out, $this->recipeId);
 		VarInt::writeSignedInt($out, $this->getWidth());
 		VarInt::writeSignedInt($out, $this->getHeight());
+		VarInt::writeUnsignedInt($out, $this->getWidth() * $this->getHeight());
 		foreach($this->input as $row){
 			foreach($row as $ingredient){
-				CommonTypes::putRecipeIngredient($out, $ingredient);
+				$ingredient->write($out);
 			}
 		}
 
@@ -152,8 +154,9 @@ final class ShapedRecipe extends RecipeWithTypeId{
 		CommonTypes::putString($out, $this->blockName);
 		VarInt::writeSignedInt($out, $this->priority);
 		CommonTypes::putBool($out, $this->symmetric);
-		$this->unlockingRequirement->write($out);
+		CommonTypes::putBool($out, $this->unlockingRequirement !== null);
+		$this->unlockingRequirement?->write($out);
 
-		CommonTypes::writeRecipeNetId($out, $this->recipeNetId);
+		VarInt::writeSignedInt($out, $this->recipeNetId);
 	}
 }

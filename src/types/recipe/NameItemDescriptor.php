@@ -16,37 +16,33 @@ namespace pocketmine\network\mcpe\protocol\types\recipe;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\LE;
+use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\GetTypeIdFromConstTrait;
 
-final class StringIdMetaItemDescriptor implements ItemDescriptor{
+final class NameItemDescriptor implements ItemDescriptor{
 	use GetTypeIdFromConstTrait;
 
-	public const ID = ItemDescriptorType::STRING_ID_META;
+	public const ID = ItemDescriptorType::NAME;
 
 	public function __construct(
-		private string $id,
-		private int $meta
-	){
-		if($meta < 0){
-			throw new \InvalidArgumentException("Meta cannot be negative");
-		}
-	}
+		private string $name,
+		private int $auxValue
+	){}
 
-	public function getId() : string{ return $this->id; }
+	public function getName() : string{ return $this->name; }
 
-	public function getMeta() : int{ return $this->meta; }
+	public function getAuxValue() : int{ return $this->auxValue; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$stringId = CommonTypes::getString($in);
-		$meta = LE::readUnsignedShort($in);
+		$name = CommonTypes::getString($in);
+		$auxValue = VarInt::readSignedInt($in);
 
-		return new self($stringId, $meta);
+		return new self($name, $auxValue);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->id);
-		LE::writeUnsignedShort($out, $this->meta);
+		CommonTypes::putString($out, $this->name);
+		VarInt::writeSignedInt($out, $this->auxValue);
 	}
 }

@@ -27,8 +27,11 @@ use function count;
 class PlayerListPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::PLAYER_LIST_PACKET;
 
-	public const TYPE_ADD = 0;
-	public const TYPE_REMOVE = 1;
+	public const TYPE_REMOVE = 0;
+	public const TYPE_ADD = 1;
+
+	private const LEGACY_TYPE_ADD = 0;
+	private const LEGACY_TYPE_REMOVE = 1;
 
 	public int $type;
 	/** @var PlayerListEntry[] */
@@ -60,9 +63,10 @@ class PlayerListPacket extends DataPacket implements ClientboundPacket{
 	}
 
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->type = Byte::readUnsigned($in);
 		$count = VarInt::readUnsignedInt($in);
 		for($i = 0; $i < $count; ++$i){
+			$this->type = VarInt::readUnsignedInt($in);
+			Byte::readUnsigned($in);
 			$entry = new PlayerListEntry();
 
 			if($this->type === self::TYPE_ADD){
@@ -71,48 +75,46 @@ class PlayerListPacket extends DataPacket implements ClientboundPacket{
 				$entry->username = CommonTypes::getString($in);
 				$entry->xboxUserId = CommonTypes::getString($in);
 				$entry->platformChatId = CommonTypes::getString($in);
+				if($in->getUnreadLength() === 0){
+					$this->entries[$i] = $entry;
+					continue;
+				}
 				$entry->buildPlatform = LE::readSignedInt($in);
 				$entry->skinData = CommonTypes::getSkin($in);
 				$entry->isTeacher = CommonTypes::getBool($in);
 				$entry->isHost = CommonTypes::getBool($in);
 				$entry->isSubClient = CommonTypes::getBool($in);
 				$entry->color = Color::fromARGB(LE::readUnsignedInt($in));
-			}else{
+			}elseif($this->type === self::TYPE_REMOVE){
 				$entry->uuid = CommonTypes::getUUID($in);
+			}else{
+				throw new PacketDecodeException("Unknown player list entry type " . $this->type);
 			}
 
 			$this->entries[$i] = $entry;
 		}
-		if($this->type === self::TYPE_ADD){
-			for($i = 0; $i < $count; ++$i){
-				$this->entries[$i]->skinData->setVerified(CommonTypes::getBool($in));
-			}
-		}
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		Byte::writeUnsigned($out, $this->type);
 		VarInt::writeUnsignedInt($out, count($this->entries));
 		foreach($this->entries as $entry){
+			VarInt::writeUnsignedInt($out, $this->type);
+			Byte::writeUnsigned($out, $this->type === self::TYPE_ADD ? self::LEGACY_TYPE_ADD : self::LEGACY_TYPE_REMOVE);
 			if($this->type === self::TYPE_ADD){
+				$skinData = $entry->skinData ?? throw new \InvalidArgumentException("Player list addition entries must have skin data");
 				CommonTypes::putUUID($out, $entry->uuid);
 				CommonTypes::putActorUniqueId($out, $entry->actorUniqueId);
 				CommonTypes::putString($out, $entry->username);
 				CommonTypes::putString($out, $entry->xboxUserId);
 				CommonTypes::putString($out, $entry->platformChatId);
 				LE::writeSignedInt($out, $entry->buildPlatform);
-				CommonTypes::putSkin($out, $entry->skinData);
+				CommonTypes::putSkin($out, $skinData);
 				CommonTypes::putBool($out, $entry->isTeacher);
 				CommonTypes::putBool($out, $entry->isHost);
 				CommonTypes::putBool($out, $entry->isSubClient);
 				LE::writeUnsignedInt($out, ($entry->color ?? new Color(255, 255, 255))->toARGB());
 			}else{
 				CommonTypes::putUUID($out, $entry->uuid);
-			}
-		}
-		if($this->type === self::TYPE_ADD){
-			foreach($this->entries as $entry){
-				CommonTypes::putBool($out, $entry->skinData->isVerified());
 			}
 		}
 	}

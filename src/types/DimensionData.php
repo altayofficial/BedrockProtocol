@@ -17,6 +17,8 @@ namespace pocketmine\network\mcpe\protocol\types;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
+use Ramsey\Uuid\UuidInterface;
 
 final class DimensionData{
 
@@ -25,6 +27,7 @@ final class DimensionData{
 		private int $minHeight,
 		private int $generator,
 		private int $dimensionType,
+		private UuidInterface $packId,
 	){}
 
 	public function getMaxHeight() : int{ return $this->maxHeight; }
@@ -35,13 +38,16 @@ final class DimensionData{
 
 	public function getDimensionType() : int{ return $this->dimensionType; }
 
+	public function getPackId() : UuidInterface{ return $this->packId; }
+
 	public static function read(ByteBufferReader $in) : self{
 		$maxHeight = VarInt::readSignedInt($in);
 		$minHeight = VarInt::readSignedInt($in);
 		$generator = VarInt::readSignedInt($in);
 		$dimensionType = VarInt::readSignedInt($in);
+		$packId = CommonTypes::getUUID($in);
 
-		return new self($maxHeight, $minHeight, $generator, $dimensionType);
+		return new self($maxHeight, $minHeight, $generator, $dimensionType, $packId);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
@@ -49,5 +55,6 @@ final class DimensionData{
 		VarInt::writeSignedInt($out, $this->minHeight);
 		VarInt::writeSignedInt($out, $this->generator);
 		VarInt::writeSignedInt($out, $this->dimensionType);
+		CommonTypes::putUUID($out, $this->packId);
 	}
 }

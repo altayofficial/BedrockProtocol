@@ -17,6 +17,8 @@ namespace pocketmine\network\mcpe\protocol\types;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
+use pocketmine\network\mcpe\protocol\PacketDecodeException;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
 final class SubChunkPacketEntryWithCache{
 
@@ -30,14 +32,18 @@ final class SubChunkPacketEntryWithCache{
 	public function getUsedBlobHash() : int{ return $this->usedBlobHash; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$base = SubChunkPacketEntryCommon::read($in, true);
+		$base = SubChunkPacketEntryCommon::read($in);
+		if(!CommonTypes::getBool($in)){
+			throw new PacketDecodeException("Expected a blob hash for a cache-enabled subchunk entry");
+		}
 		$usedBlobHash = LE::readUnsignedLong($in);
 
 		return new self($base, $usedBlobHash);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		$this->base->write($out, true);
+		$this->base->write($out);
+		CommonTypes::putBool($out, true);
 		LE::writeUnsignedLong($out, $this->usedBlobHash);
 	}
 }

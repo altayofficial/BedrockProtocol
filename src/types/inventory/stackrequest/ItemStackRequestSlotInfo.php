@@ -17,7 +17,7 @@ namespace pocketmine\network\mcpe\protocol\types\inventory\stackrequest;
 use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
+use pmmp\encoding\LE;
 use pocketmine\network\mcpe\protocol\types\inventory\FullContainerName;
 
 final class ItemStackRequestSlotInfo{
@@ -36,13 +36,13 @@ final class ItemStackRequestSlotInfo{
 	public static function read(ByteBufferReader $in) : self{
 		$containerName = FullContainerName::read($in);
 		$slotId = Byte::readUnsigned($in);
-		$stackId = CommonTypes::readItemStackNetIdVariant($in);
+		$stackId = LE::readSignedInt($in);
 		return new self($containerName, $slotId, $stackId);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
 		$this->containerName->write($out);
 		Byte::writeUnsigned($out, $this->slotId);
-		CommonTypes::writeItemStackNetIdVariant($out, $this->stackId);
+		LE::writeSignedInt($out, $this->stackId);
 	}
 }

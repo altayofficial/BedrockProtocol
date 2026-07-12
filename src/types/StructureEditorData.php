@@ -14,6 +14,13 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types;
 
+use pmmp\encoding\Byte;
+use pmmp\encoding\ByteBufferReader;
+use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\DataDecodeException;
+use pmmp\encoding\VarInt;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
+
 class StructureEditorData{
 	public const TYPE_DATA = 0;
 	public const TYPE_SAVE = 1;
@@ -30,4 +37,35 @@ class StructureEditorData{
 	public int $structureBlockType;
 	public StructureSettings $structureSettings;
 	public int $structureRedstoneSaveMode;
+
+	/** @throws DataDecodeException */
+	public static function read(ByteBufferReader $in) : self{
+		$result = new self();
+
+		$result->structureName = CommonTypes::getString($in);
+		$result->filteredStructureName = CommonTypes::getString($in);
+		$result->structureDataField = CommonTypes::getString($in);
+
+		$result->includePlayers = CommonTypes::getBool($in);
+		$result->showBoundingBox = CommonTypes::getBool($in);
+
+		$result->structureBlockType = VarInt::readSignedInt($in);
+		$result->structureSettings = CommonTypes::getStructureSettings($in);
+		$result->structureRedstoneSaveMode = Byte::readUnsigned($in);
+
+		return $result;
+	}
+
+	public function write(ByteBufferWriter $out) : void{
+		CommonTypes::putString($out, $this->structureName);
+		CommonTypes::putString($out, $this->filteredStructureName);
+		CommonTypes::putString($out, $this->structureDataField);
+
+		CommonTypes::putBool($out, $this->includePlayers);
+		CommonTypes::putBool($out, $this->showBoundingBox);
+
+		VarInt::writeSignedInt($out, $this->structureBlockType);
+		CommonTypes::putStructureSettings($out, $this->structureSettings);
+		Byte::writeUnsigned($out, $this->structureRedstoneSaveMode);
+	}
 }

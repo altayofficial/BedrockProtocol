@@ -12,17 +12,9 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\sound;
 
-use pmmp\encoding\ByteBufferWriter;
+final class StopSoundData extends SoundData{
 
-final class PlayerBlockActionStopBreak implements PlayerBlockAction{
-
-	public function getActionType() : int{
-		return PlayerAction::STOP_BREAK;
-	}
-
-	public function write(ByteBufferWriter $out) : void{
-		//NOOP
-	}
+	public function getEvent() : SoundDataEvent{ return SoundDataEvent::STOP; }
 }

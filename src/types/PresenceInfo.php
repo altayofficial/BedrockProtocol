@@ -23,28 +23,18 @@ use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
  */
 final class PresenceInfo{
 	public function __construct(
-		private ?string $experienceName,
-		private ?string $worldName,
-		private string $richPresenceId
+		private ?string $richPresenceId
 	){}
 
-	public function getExperienceName() : ?string{ return $this->experienceName; }
-
-	public function getWorldName() : ?string{ return $this->worldName; }
-
-	public function getRichPresenceId() : string{ return $this->richPresenceId; }
+	public function getRichPresenceId() : ?string{ return $this->richPresenceId; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$experienceName = CommonTypes::readOptional($in, CommonTypes::getString(...));
-		$worldName = CommonTypes::readOptional($in, CommonTypes::getString(...));
-		$richPresenceId = CommonTypes::getString($in);
+		$richPresenceId = CommonTypes::readOptional($in, CommonTypes::getString(...));
 
-		return new self($experienceName, $worldName, $richPresenceId);
+		return new self($richPresenceId);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::writeOptional($out, $this->experienceName, CommonTypes::putString(...));
-		CommonTypes::writeOptional($out, $this->worldName, CommonTypes::putString(...));
-		CommonTypes::putString($out, $this->richPresenceId);
+		CommonTypes::writeOptional($out, $this->richPresenceId, CommonTypes::putString(...));
 	}
 }

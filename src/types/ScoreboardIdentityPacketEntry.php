@@ -17,6 +17,6 @@ namespace pocketmine\network\mcpe\protocol\types;
 class ScoreboardIdentityPacketEntry{
 
 	public int $scoreboardId;
-	public ?int $actorUniqueId = null;
+	public int $actorUniqueId;
 
 }

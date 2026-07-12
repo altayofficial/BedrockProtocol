@@ -12,12 +12,9 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types\recipe;
+namespace pocketmine\network\mcpe\protocol\types\sound;
 
-final class ItemDescriptorType{
+final class PauseSoundData extends SoundData{
 
-	public const EMPTY = 0;
-	public const NAME = 1;
-	public const MOLANG = 2;
-	public const TAG = 3;
+	public function getEvent() : SoundDataEvent{ return SoundDataEvent::PAUSE; }
 }

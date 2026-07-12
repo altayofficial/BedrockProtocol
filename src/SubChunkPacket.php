@@ -16,7 +16,6 @@ namespace pocketmine\network\mcpe\protocol;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\LE;
 use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\SubChunkPacketEntryWithCache as EntryWithBlobHash;
@@ -55,9 +54,9 @@ class SubChunkPacket extends DataPacket implements ClientboundPacket{
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$cacheEnabled = CommonTypes::getBool($in);
 		$this->dimension = VarInt::readSignedInt($in);
-		$this->baseSubChunkPosition = SubChunkPosition::read($in);
+		$this->baseSubChunkPosition = SubChunkPosition::read($in, true);
 
-		$count = LE::readUnsignedInt($in);
+		$count = VarInt::readUnsignedInt($in);
 		if($cacheEnabled){
 			$entries = [];
 			for($i = 0; $i < $count; $i++){
@@ -76,9 +75,9 @@ class SubChunkPacket extends DataPacket implements ClientboundPacket{
 	protected function encodePayload(ByteBufferWriter $out) : void{
 		CommonTypes::putBool($out, $this->entries instanceof ListWithBlobHashes);
 		VarInt::writeSignedInt($out, $this->dimension);
-		$this->baseSubChunkPosition->write($out);
+		$this->baseSubChunkPosition->write($out, true);
 
-		LE::writeUnsignedInt($out, count($this->entries->getEntries()));
+		VarInt::writeUnsignedInt($out, count($this->entries->getEntries()));
 
 		foreach($this->entries->getEntries() as $entry){
 			$entry->write($out);

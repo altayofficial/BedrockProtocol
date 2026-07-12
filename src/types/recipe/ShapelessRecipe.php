@@ -37,7 +37,7 @@ final class ShapelessRecipe extends RecipeWithTypeId{
 		private UuidInterface $uuid,
 		private string $blockName,
 		private int $priority,
-		private RecipeUnlockingRequirement $unlockingRequirement,
+		private ?RecipeUnlockingRequirement $unlockingRequirement,
 		private int $recipeNetId
 	){
 		parent::__construct($typeId);
@@ -75,7 +75,7 @@ final class ShapelessRecipe extends RecipeWithTypeId{
 		return $this->priority;
 	}
 
-	public function getUnlockingRequirement() : RecipeUnlockingRequirement{ return $this->unlockingRequirement; }
+	public function getUnlockingRequirement() : ?RecipeUnlockingRequirement{ return $this->unlockingRequirement; }
 
 	public function getRecipeNetId() : int{
 		return $this->recipeNetId;
@@ -85,7 +85,7 @@ final class ShapelessRecipe extends RecipeWithTypeId{
 		$recipeId = CommonTypes::getString($in);
 		$input = [];
 		for($j = 0, $ingredientCount = VarInt::readUnsignedInt($in); $j < $ingredientCount; ++$j){
-			$input[] = CommonTypes::getRecipeIngredient($in);
+			$input[] = RecipeIngredient::read($in);
 		}
 		$output = [];
 		for($k = 0, $resultCount = VarInt::readUnsignedInt($in); $k < $resultCount; ++$k){
@@ -94,9 +94,9 @@ final class ShapelessRecipe extends RecipeWithTypeId{
 		$uuid = CommonTypes::getUUID($in);
 		$block = CommonTypes::getString($in);
 		$priority = VarInt::readSignedInt($in);
-		$unlockingRequirement = RecipeUnlockingRequirement::read($in);
+		$unlockingRequirement = CommonTypes::getBool($in) ? RecipeUnlockingRequirement::read($in) : null;
 
-		$recipeNetId = CommonTypes::readRecipeNetId($in);
+		$recipeNetId = VarInt::readSignedInt($in);
 
 		return new self($recipeType, $recipeId, $input, $output, $uuid, $block, $priority, $unlockingRequirement, $recipeNetId);
 	}
@@ -105,7 +105,7 @@ final class ShapelessRecipe extends RecipeWithTypeId{
 		CommonTypes::putString($out, $this->recipeId);
 		VarInt::writeUnsignedInt($out, count($this->inputs));
 		foreach($this->inputs as $item){
-			CommonTypes::putRecipeIngredient($out, $item);
+			$item->write($out);
 		}
 
 		VarInt::writeUnsignedInt($out, count($this->outputs));
@@ -116,8 +116,9 @@ final class ShapelessRecipe extends RecipeWithTypeId{
 		CommonTypes::putUUID($out, $this->uuid);
 		CommonTypes::putString($out, $this->blockName);
 		VarInt::writeSignedInt($out, $this->priority);
-		$this->unlockingRequirement->write($out);
+		CommonTypes::putBool($out, $this->unlockingRequirement !== null);
+		$this->unlockingRequirement?->write($out);
 
-		CommonTypes::writeRecipeNetId($out, $this->recipeNetId);
+		VarInt::writeSignedInt($out, $this->recipeNetId);
 	}
 }

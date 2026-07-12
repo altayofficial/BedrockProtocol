@@ -16,6 +16,7 @@ namespace pocketmine\network\mcpe\protocol\types\recipe;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use Ramsey\Uuid\UuidInterface;
 
@@ -52,12 +53,12 @@ final class MultiRecipe extends RecipeWithTypeId{
 
 	public static function decode(int $typeId, ByteBufferReader $in) : self{
 		$uuid = CommonTypes::getUUID($in);
-		$recipeNetId = CommonTypes::readRecipeNetId($in);
+		$recipeNetId = VarInt::readSignedInt($in);
 		return new self($typeId, $uuid, $recipeNetId);
 	}
 
 	public function encode(ByteBufferWriter $out) : void{
 		CommonTypes::putUUID($out, $this->recipeId);
-		CommonTypes::writeRecipeNetId($out, $this->recipeNetId);
+		VarInt::writeSignedInt($out, $this->recipeNetId);
 	}
 }

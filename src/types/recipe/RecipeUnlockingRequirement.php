@@ -22,13 +22,21 @@ use function count;
 
 final class RecipeUnlockingRequirement{
 
+	public const CONTEXT_NONE = 0;
+	public const CONTEXT_ALWAYS_UNLOCKED = 1;
+	public const CONTEXT_PLAYER_IN_WATER = 2;
+	public const CONTEXT_PLAYER_HAS_MANY_ITEMS = 3;
+
 	/**
 	 * @param RecipeIngredient[]|null $unlockingIngredients
 	 * @phpstan-param list<RecipeIngredient>|null $unlockingIngredients
 	 */
 	public function __construct(
+		private int $unlockingContext,
 		private ?array $unlockingIngredients
 	){}
+
+	public function getUnlockingContext() : int{ return $this->unlockingContext; }
 
 	/**
 	 * @return RecipeIngredient[]|null
@@ -37,26 +45,25 @@ final class RecipeUnlockingRequirement{
 	public function getUnlockingIngredients() : ?array{ return $this->unlockingIngredients; }
 
 	public static function read(ByteBufferReader $in) : self{
-		//I don't know what the point of this structure is. It could easily have been a list<RecipeIngredient> instead.
-		//It's basically just an optional list, which could have been done by an empty list wherever it's not needed.
-		$unlockingContext = CommonTypes::getBool($in);
+		$unlockingContext = VarInt::readSignedInt($in);
 		$unlockingIngredients = null;
-		if(!$unlockingContext){
+		if(CommonTypes::getBool($in)){
 			$unlockingIngredients = [];
 			for($i = 0, $count = VarInt::readUnsignedInt($in); $i < $count; $i++){
-				$unlockingIngredients[] = CommonTypes::getRecipeIngredient($in);
+				$unlockingIngredients[] = RecipeIngredient::read($in);
 			}
 		}
 
-		return new self($unlockingIngredients);
+		return new self($unlockingContext, $unlockingIngredients);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putBool($out, $this->unlockingIngredients === null);
+		VarInt::writeSignedInt($out, $this->unlockingContext);
+		CommonTypes::putBool($out, $this->unlockingIngredients !== null);
 		if($this->unlockingIngredients !== null){
 			VarInt::writeUnsignedInt($out, count($this->unlockingIngredients));
 			foreach($this->unlockingIngredients as $ingredient){
-				CommonTypes::putRecipeIngredient($out, $ingredient);
+				$ingredient->write($out);
 			}
 		}
 	}

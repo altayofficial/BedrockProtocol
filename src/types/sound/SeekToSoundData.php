@@ -12,15 +12,22 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types\inventory;
+namespace pocketmine\network\mcpe\protocol\types\sound;
 
-final class ItemStackWrapper{
+use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\LE;
+
+final class SeekToSoundData extends SoundData{
+
 	public function __construct(
-		private int $stackId,
-		private ItemStack $itemStack
+		private float $seconds
 	){}
 
-	public function getStackId() : int{ return $this->stackId; }
+	public function getSeconds() : float{ return $this->seconds; }
 
-	public function getItemStack() : ItemStack{ return $this->itemStack; }
+	public function getEvent() : SoundDataEvent{ return SoundDataEvent::SEEK_TO; }
+
+	protected function writeData(ByteBufferWriter $out) : void{
+		LE::writeFloat($out, $this->seconds);
+	}
 }
