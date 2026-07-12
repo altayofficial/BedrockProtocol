@@ -59,6 +59,7 @@ use pocketmine\network\mcpe\protocol\types\skin\SkinData;
 use pocketmine\network\mcpe\protocol\types\skin\SkinImage;
 use pocketmine\network\mcpe\protocol\types\StructureEditorData;
 use pocketmine\network\mcpe\protocol\types\StructureSettings;
+use pocketmine\utils\Binary;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use function count;
@@ -347,7 +348,7 @@ final class CommonTypes{
 			$stackId = 0;
 		}
 
-		$blockRuntimeId = VarInt::readUnsignedInt($in);
+		$blockRuntimeId = Binary::signInt(VarInt::readUnsignedInt($in));
 		$rawExtraData = self::getString($in);
 
 		return new ItemStackWrapper($stackId, new ItemStack($id, $meta, $count, $blockRuntimeId, $rawExtraData), $variant);
