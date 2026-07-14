@@ -19,8 +19,6 @@
  *
  * @author Altay Team
  * @link https://github.com/altayofficial
- *
- *
  */
 
 declare(strict_types=1);
