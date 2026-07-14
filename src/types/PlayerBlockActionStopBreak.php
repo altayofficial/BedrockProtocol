@@ -25,34 +25,17 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types\entity;
+namespace pocketmine\network\mcpe\protocol\types;
 
-use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\VarInt;
-use pocketmine\network\mcpe\protocol\types\GetTypeIdFromConstTrait;
-use const PHP_INT_MAX;
-use const PHP_INT_MIN;
 
-final class LongMetadataProperty implements MetadataProperty{
-	use GetTypeIdFromConstTrait;
-	use IntegerishMetadataProperty;
+final class PlayerBlockActionStopBreak implements PlayerBlockAction{
 
-	public const ID = EntityMetadataTypes::LONG;
-
-	protected function min() : int{
-		return PHP_INT_MIN;
-	}
-
-	protected function max() : int{
-		return PHP_INT_MAX;
-	}
-
-	public static function read(ByteBufferReader $in) : self{
-		return new self(VarInt::readSignedLong($in));
+	public function getActionType() : int{
+		return PlayerAction::STOP_BREAK;
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		VarInt::writeSignedLong($out, $this->value);
+		//NOOP
 	}
 }
