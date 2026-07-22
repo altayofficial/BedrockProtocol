@@ -81,7 +81,7 @@ class PlayerUpdateEntityOverridesPacket extends DataPacket implements Clientboun
 	public function getFloatOverrideValue() : ?float{ return $this->floatOverrideValue; }
 
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->actorRuntimeId = CommonTypes::getActorRuntimeId($in);
+		$this->actorRuntimeId = CommonTypes::getActorUniqueId($in);
 		$this->propertyIndex = VarInt::readUnsignedInt($in);
 		$this->updateType = OverrideUpdateType::fromPacket(VarInt::readUnsignedInt($in));
 		CommonTypes::getString($in);
@@ -93,7 +93,7 @@ class PlayerUpdateEntityOverridesPacket extends DataPacket implements Clientboun
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		CommonTypes::putActorRuntimeId($out, $this->actorRuntimeId);
+		CommonTypes::putActorUniqueId($out, $this->actorRuntimeId);
 		VarInt::writeUnsignedInt($out, $this->propertyIndex);
 		VarInt::writeUnsignedInt($out, $this->updateType->value);
 		CommonTypes::putString($out, $this->updateType->getId());
