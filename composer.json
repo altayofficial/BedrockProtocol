@@ -9,9 +9,15 @@
         "pocketmine/binaryutils": "^0.2.0",
         "pocketmine/color": "^0.2.0 || ^0.3.0",
         "pocketmine/math": "^0.3.0 || ^0.4.0 || ^1.0.0",
-        "pocketmine/nbt": "^1.0.0",
+        "altayofficial/nbt": "dev-stable",
         "ramsey/uuid": "^4.1"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/altayofficial/NBT.git"
+        }
+    ],
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.92",
         "phpstan/phpstan": "2.1.0",
