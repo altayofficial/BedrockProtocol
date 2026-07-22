@@ -297,17 +297,15 @@ final class CommonTypes{
 
 		$hasNetId = self::getBool($in);
 		if ($hasNetId) {
-			$stackIdVariant = VarInt::readUnsignedInt($in);
 			$stackId = VarInt::readSignedInt($in);
 		} else {
-			$stackIdVariant = 0;
 			$stackId = 0;
 		}
 
 		$blockRuntimeId = Binary::signInt(VarInt::readUnsignedInt($in));
 		$rawExtraData = self::getString($in);
 
-		return new ItemStackWrapper($stackId, new ItemStack($id, $meta, $count, $blockRuntimeId, $rawExtraData), $stackIdVariant);
+		return new ItemStackWrapper($stackId, new ItemStack($id, $meta, $count, $blockRuntimeId, $rawExtraData));
 	}
 
 	public static function putNetworkItemStackDescriptor(ByteBufferWriter $out, ItemStackWrapper $itemStackWrapper) : void{
@@ -317,7 +315,6 @@ final class CommonTypes{
 
 		self::putBool($out, $hasNetId = $itemStackWrapper->getStackId() !== 0);
 		if($hasNetId){
-			VarInt::writeUnsignedInt($out, $itemStackWrapper->getStackIdVariant());
 			VarInt::writeSignedInt($out, $itemStackWrapper->getStackId());
 		}
 

@@ -28,13 +28,10 @@ namespace pocketmine\network\mcpe\protocol\types\inventory;
 final class ItemStackWrapper{
 	public function __construct(
 		private int $stackId,
-		private ItemStack $itemStack,
-		private int $stackIdVariant = 0
+		private ItemStack $itemStack
 	){}
 
 	public function getStackId() : int{ return $this->stackId; }
 
 	public function getItemStack() : ItemStack{ return $this->itemStack; }
-
-	public function getStackIdVariant() : int{ return $this->stackIdVariant; }
 }
