@@ -50,7 +50,7 @@ final class ClientDataToSkinDataHelper{
 		"persona_dress" => PersonaSkinPiece::PIECE_TYPE_DRESS,
 		"persona_top" => PersonaSkinPiece::PIECE_TYPE_TOP,
 		"persona_high_pants" => PersonaSkinPiece::PIECE_TYPE_HIGH_PANTS,
-		"persona_hands" => PersonaSkinPiece::PIECE_TYPE_HANDS,
+		"persona_hand" => PersonaSkinPiece::PIECE_TYPE_HANDS, // WHAT THE FUCK
 		"persona_outerwear" => PersonaSkinPiece::PIECE_TYPE_OUTERWEAR,
 		"persona_facial_hair" => PersonaSkinPiece::PIECE_TYPE_FACIAL_HAIR,
 		"persona_mouth" => PersonaSkinPiece::PIECE_TYPE_MOUTH,

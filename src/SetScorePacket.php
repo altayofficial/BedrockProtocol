@@ -36,6 +36,12 @@ use function count;
 class SetScorePacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::SET_SCORE_PACKET;
 
+	// TODO: we have duplicate of those types, this one stays for backwards compatibility
+	const TYPE_REMOVE = "remove";
+	const TYPE_PLAYER = "changeplayer";
+	const TYPE_ENTITY = "changeentity";
+	const TYPE_FAKE_PLAYER = "changefakeplayer";
+
 	private const ACTION_IDS = [
 		ScorePacketEntry::TYPE_REMOVE => "remove",
 		ScorePacketEntry::TYPE_PLAYER => "changeplayer",
