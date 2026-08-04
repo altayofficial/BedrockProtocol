@@ -27,8 +27,8 @@ namespace pocketmine\network\mcpe\protocol\types\inventory\stackrequest;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\LE;
 use pmmp\encoding\VarInt;
-use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\GetTypeIdFromConstTrait;
 
 final class MineBlockStackRequestAction extends ItemStackRequestAction{
@@ -51,13 +51,14 @@ final class MineBlockStackRequestAction extends ItemStackRequestAction{
 	public static function read(ByteBufferReader $in) : self{
 		$hotbarSlot = VarInt::readSignedInt($in);
 		$predictedDurability = VarInt::readSignedInt($in);
-		$stackId = CommonTypes::readItemStackNetIdVariant($in);
+		//unlike everywhere else, this one is a plain int since 1.26.40 instead of the usual net ID variant
+		$stackId = LE::readSignedInt($in);
 		return new self($hotbarSlot, $predictedDurability, $stackId);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
 		VarInt::writeSignedInt($out, $this->hotbarSlot);
 		VarInt::writeSignedInt($out, $this->predictedDurability);
-		CommonTypes::writeItemStackNetIdVariant($out, $this->stackId);
+		LE::writeSignedInt($out, $this->stackId);
 	}
 }
