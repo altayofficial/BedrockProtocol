@@ -1,13 +1,24 @@
 <?php
 
 /*
- * This file is part of BedrockProtocol.
- * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
  *
- * BedrockProtocol is free software: you can redistribute it and/or modify
+ *      _    _ _
+ *     / \  | | |_ __ _ _   _
+ *    / _ \ | | __/ _` | | | |
+ *   / ___ \| | || (_| | |_| |
+ *  /_/   \_\_|\__\__,_|\__, |
+ *                       |___/
+ *
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * Original work by the PocketMine Team.
+ * https://www.pocketmine.net/
+ *
+ * @author Altay Team
+ * @link https://github.com/altayofficial
  */
 
 declare(strict_types=1);
@@ -17,6 +28,7 @@ namespace pocketmine\network\mcpe\protocol\types\inventory\stackrequest;
 use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\GetTypeIdFromConstTrait;
 use pocketmine\network\mcpe\protocol\types\recipe\RecipeIngredient;
@@ -38,15 +50,12 @@ final class CraftRecipeAutoStackRequestAction extends ItemStackRequestAction{
 	final public function __construct(
 		private int $recipeId,
 		private int $repetitions,
-		private int $repetitions2,
 		private array $ingredients
 	){}
 
 	public function getRecipeId() : int{ return $this->recipeId; }
 
 	public function getRepetitions() : int{ return $this->repetitions; }
-
-	public function getRepetitions2() : int{ return $this->repetitions2; }
 
 	/**
 	 * @return RecipeIngredient[]
@@ -57,19 +66,17 @@ final class CraftRecipeAutoStackRequestAction extends ItemStackRequestAction{
 	public static function read(ByteBufferReader $in) : self{
 		$recipeId = CommonTypes::readRecipeNetId($in);
 		$repetitions = Byte::readUnsigned($in);
-		$repetitions2 = Byte::readUnsigned($in); //repetitions property is sent twice, mojang...
 		$ingredients = [];
-		for($i = 0, $count = Byte::readUnsigned($in); $i < $count; ++$i){
+		for($i = 0, $count = VarInt::readUnsignedInt($in); $i < $count; ++$i){
 			$ingredients[] = CommonTypes::getRecipeIngredient($in);
 		}
-		return new self($recipeId, $repetitions, $repetitions2, $ingredients);
+		return new self($recipeId, $repetitions, $ingredients);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
 		CommonTypes::writeRecipeNetId($out, $this->recipeId);
 		Byte::writeUnsigned($out, $this->repetitions);
-		Byte::writeUnsigned($out, $this->repetitions2);
-		Byte::writeUnsigned($out, count($this->ingredients));
+		VarInt::writeUnsignedInt($out, count($this->ingredients));
 		foreach($this->ingredients as $ingredient){
 			CommonTypes::putRecipeIngredient($out, $ingredient);
 		}

@@ -1,13 +1,24 @@
 <?php
 
 /*
- * This file is part of BedrockProtocol.
- * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
  *
- * BedrockProtocol is free software: you can redistribute it and/or modify
+ *      _    _ _
+ *     / \  | | |_ __ _ _   _
+ *    / _ \ | | __/ _` | | | |
+ *   / ___ \| | || (_| | |_| |
+ *  /_/   \_\_|\__\__,_|\__, |
+ *                       |___/
+ *
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * Original work by the PocketMine Team.
+ * https://www.pocketmine.net/
+ *
+ * @author Altay Team
+ * @link https://github.com/altayofficial
  */
 
 declare(strict_types=1);
@@ -19,8 +30,12 @@ use Ramsey\Uuid\Uuid;
 
 class SkinData{
 
-	public const ARM_SIZE_SLIM = "slim";
-	public const ARM_SIZE_WIDE = "wide";
+	public const ARM_SIZE_SLIM = 0;
+	public const ARM_SIZE_WIDE = 1;
+
+	public const TRUSTED_SKIN_FLAG_UNSET = "unset";
+	public const TRUSTED_SKIN_FLAG_FALSE = "false";
+	public const TRUSTED_SKIN_FLAG_TRUE = "true";
 
 	private SkinImage $capeImage;
 	private string $fullSkinId;
@@ -42,8 +57,8 @@ class SkinData{
 		private string $animationData = "",
 		private string $capeId = "",
 		?string $fullSkinId = null,
-		private string $armSize = self::ARM_SIZE_WIDE,
-		private string $skinColor = "",
+		private int $armSize = self::ARM_SIZE_WIDE,
+		private int $skinColor = 0,
 		private array $personaPieces = [],
 		private array $pieceTintColors = [],
 		private bool $isVerified = true,
@@ -51,7 +66,9 @@ class SkinData{
 		private bool $persona = false,
 		private bool $personaCapeOnClassic = false,
 		private bool $isPrimaryUser = true,
-		private bool $override = true
+		private bool $override = true,
+		private string $trustedSkinFlag = self::TRUSTED_SKIN_FLAG_UNSET,
+		private string $profileHash = ""
 	){
 		$this->capeImage = $capeImage ?? new SkinImage(0, 0, "");
 		//this has to be unique or the client will do stupid things
@@ -101,11 +118,11 @@ class SkinData{
 		return $this->fullSkinId;
 	}
 
-	public function getArmSize() : string{
+	public function getArmSize() : int{
 		return $this->armSize;
 	}
 
-	public function getSkinColor() : string{
+	public function getSkinColor() : int{
 		return $this->skinColor;
 	}
 
@@ -138,6 +155,10 @@ class SkinData{
 	public function isPrimaryUser() : bool{ return $this->isPrimaryUser; }
 
 	public function isOverride() : bool{ return $this->override; }
+
+	public function getTrustedSkinFlag() : string{ return $this->trustedSkinFlag; }
+
+	public function getProfileHash() : string{ return $this->profileHash; }
 
 	public function isVerified() : bool{
 		return $this->isVerified;

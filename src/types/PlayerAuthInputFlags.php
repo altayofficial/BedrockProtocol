@@ -1,13 +1,24 @@
 <?php
 
 /*
- * This file is part of BedrockProtocol.
- * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
  *
- * BedrockProtocol is free software: you can redistribute it and/or modify
+ *      _    _ _
+ *     / \  | | |_ __ _ _   _
+ *    / _ \ | | __/ _` | | | |
+ *   / ___ \| | || (_| | |_| |
+ *  /_/   \_\_|\__\__,_|\__, |
+ *                       |___/
+ *
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * Original work by the PocketMine Team.
+ * https://www.pocketmine.net/
+ *
+ * @author Altay Team
+ * @link https://github.com/altayofficial
  */
 
 declare(strict_types=1);
@@ -118,6 +129,7 @@ final class PlayerAuthInputFlags{
 	public const SNEAK_RELEASED_RAW = 62;
 	public const SNEAK_PRESSED_RAW = 63;
 	public const SNEAK_CURRENT_RAW = 64;
+	public const INTERNAL_UPDATE = 65;
 
-	public const NUMBER_OF_FLAGS = 65;
+	public const NUMBER_OF_FLAGS = 66;
 }

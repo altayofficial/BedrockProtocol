@@ -1,13 +1,24 @@
 <?php
 
 /*
- * This file is part of BedrockProtocol.
- * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
  *
- * BedrockProtocol is free software: you can redistribute it and/or modify
+ *      _    _ _
+ *     / \  | | |_ __ _ _   _
+ *    / _ \ | | __/ _` | | | |
+ *   / ___ \| | || (_| | |_| |
+ *  /_/   \_\_|\__\__,_|\__, |
+ *                       |___/
+ *
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * Original work by the PocketMine Team.
+ * https://www.pocketmine.net/
+ *
+ * @author Altay Team
+ * @link https://github.com/altayofficial
  */
 
 declare(strict_types=1);
@@ -16,7 +27,7 @@ namespace pocketmine\network\mcpe\protocol;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\LE;
+use pmmp\encoding\VarInt;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\PlayerLocationType;
@@ -54,8 +65,9 @@ class PlayerLocationPacket extends DataPacket implements ClientboundPacket{
 	public function getPosition() : ?Vector3{ return $this->position; }
 
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->type = PlayerLocationType::fromPacket(LE::readUnsignedInt($in));
 		$this->actorUniqueId = CommonTypes::getActorUniqueId($in);
+		$this->type = PlayerLocationType::fromPacket(VarInt::readUnsignedInt($in));
+		VarInt::readSignedInt($in);
 
 		if($this->type === PlayerLocationType::PLAYER_LOCATION_COORDINATES){
 			$this->position = CommonTypes::getVector3($in);
@@ -63,8 +75,9 @@ class PlayerLocationPacket extends DataPacket implements ClientboundPacket{
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		LE::writeUnsignedInt($out, $this->type->value);
 		CommonTypes::putActorUniqueId($out, $this->actorUniqueId);
+		VarInt::writeUnsignedInt($out, $this->type->value);
+		VarInt::writeSignedInt($out, 0);
 
 		if($this->type === PlayerLocationType::PLAYER_LOCATION_COORDINATES){
 			if($this->position === null){ // this should never be the case

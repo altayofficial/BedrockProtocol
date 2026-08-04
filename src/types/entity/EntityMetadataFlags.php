@@ -1,13 +1,24 @@
 <?php
 
 /*
- * This file is part of BedrockProtocol.
- * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
  *
- * BedrockProtocol is free software: you can redistribute it and/or modify
+ *      _    _ _
+ *     / \  | | |_ __ _ _   _
+ *    / _ \ | | __/ _` | | | |
+ *   / ___ \| | || (_| | |_| |
+ *  /_/   \_\_|\__\__,_|\__, |
+ *                       |___/
+ *
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * Original work by the PocketMine Team.
+ * https://www.pocketmine.net/
+ *
+ * @author Altay Team
+ * @link https://github.com/altayofficial
  */
 
 declare(strict_types=1);
@@ -147,6 +158,9 @@ final class EntityMetadataFlags{
 	public const CAN_USE_VERTICAL_MOVEMENT_ACTION = 125;
 	public const ROTATION_LOCKED_TO_VEHICLE = 126;
 	public const USES_LEGACY_FRICTION = 127;
+	public const USES_UNIFORM_AIR_DRAG = 128;
+	public const NAMEPLATE_DEPTH_TESTED = 129;
+	public const NOT_PICKABLE_FROM_INSIDE = 130;
 
-	public const NUMBER_OF_FLAGS = 128;
+	public const NUMBER_OF_FLAGS = 131;
 }

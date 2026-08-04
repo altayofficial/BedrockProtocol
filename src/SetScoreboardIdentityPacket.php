@@ -1,13 +1,24 @@
 <?php
 
 /*
- * This file is part of BedrockProtocol.
- * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
  *
- * BedrockProtocol is free software: you can redistribute it and/or modify
+ *      _    _ _
+ *     / \  | | |_ __ _ _   _
+ *    / _ \ | | __/ _` | | | |
+ *   / ___ \| | || (_| | |_| |
+ *  /_/   \_\_|\__\__,_|\__, |
+ *                       |___/
+ *
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * Original work by the PocketMine Team.
+ * https://www.pocketmine.net/
+ *
+ * @author Altay Team
+ * @link https://github.com/altayofficial
  */
 
 declare(strict_types=1);
@@ -48,9 +59,7 @@ class SetScoreboardIdentityPacket extends DataPacket implements ClientboundPacke
 		for($i = 0, $count = VarInt::readUnsignedInt($in); $i < $count; ++$i){
 			$entry = new ScoreboardIdentityPacketEntry();
 			$entry->scoreboardId = VarInt::readSignedLong($in);
-			if($this->type === self::TYPE_REGISTER_IDENTITY){
-				$entry->actorUniqueId = CommonTypes::getActorUniqueId($in);
-			}
+			$entry->actorUniqueId = CommonTypes::getActorUniqueId($in);
 
 			$this->entries[] = $entry;
 		}
@@ -61,9 +70,7 @@ class SetScoreboardIdentityPacket extends DataPacket implements ClientboundPacke
 		VarInt::writeUnsignedInt($out, count($this->entries));
 		foreach($this->entries as $entry){
 			VarInt::writeSignedLong($out, $entry->scoreboardId);
-			if($this->type === self::TYPE_REGISTER_IDENTITY){
-				CommonTypes::putActorUniqueId($out, $entry->actorUniqueId);
-			}
+			CommonTypes::putActorUniqueId($out, $entry->actorUniqueId);
 		}
 	}
 

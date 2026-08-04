@@ -1,13 +1,24 @@
 <?php
 
 /*
- * This file is part of BedrockProtocol.
- * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
  *
- * BedrockProtocol is free software: you can redistribute it and/or modify
+ *      _    _ _
+ *     / \  | | |_ __ _ _   _
+ *    / _ \ | | __/ _` | | | |
+ *   / ___ \| | || (_| | |_| |
+ *  /_/   \_\_|\__\__,_|\__, |
+ *                       |___/
+ *
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * Original work by the PocketMine Team.
+ * https://www.pocketmine.net/
+ *
+ * @author Altay Team
+ * @link https://github.com/altayofficial
  */
 
 declare(strict_types=1);
@@ -38,8 +49,8 @@ class MovePlayerPacket extends DataPacket implements ClientboundPacket, Serverbo
 	public int $mode = self::MODE_NORMAL;
 	public bool $onGround = false; //TODO
 	public int $ridingActorRuntimeId = 0;
-	public int $teleportCause = 0;
-	public int $teleportItem = 0;
+	public ?int $teleportCause = null;
+	public ?int $teleportItem = null;
 	public int $tick = 0;
 
 	/**
@@ -54,8 +65,8 @@ class MovePlayerPacket extends DataPacket implements ClientboundPacket, Serverbo
 		int $mode,
 		bool $onGround,
 		int $ridingActorRuntimeId,
-		int $teleportCause,
-		int $teleportItem,
+		?int $teleportCause,
+		?int $teleportItem,
 		int $tick,
 	) : self{
 		$result = new self;
@@ -84,7 +95,7 @@ class MovePlayerPacket extends DataPacket implements ClientboundPacket, Serverbo
 		int $ridingActorRuntimeId,
 		int $tick,
 	) : self{
-		return self::create($actorRuntimeId, $position, $pitch, $yaw, $headYaw, $mode, $onGround, $ridingActorRuntimeId, 0, 0, $tick);
+		return self::create($actorRuntimeId, $position, $pitch, $yaw, $headYaw, $mode, $onGround, $ridingActorRuntimeId, null, null, $tick);
 	}
 
 	protected function decodePayload(ByteBufferReader $in) : void{
@@ -96,7 +107,7 @@ class MovePlayerPacket extends DataPacket implements ClientboundPacket, Serverbo
 		$this->mode = Byte::readUnsigned($in);
 		$this->onGround = CommonTypes::getBool($in);
 		$this->ridingActorRuntimeId = CommonTypes::getActorRuntimeId($in);
-		if($this->mode === MovePlayerPacket::MODE_TELEPORT){
+		if(CommonTypes::getBool($in)){
 			$this->teleportCause = LE::readSignedInt($in);
 			$this->teleportItem = LE::readSignedInt($in);
 		}
@@ -112,7 +123,9 @@ class MovePlayerPacket extends DataPacket implements ClientboundPacket, Serverbo
 		Byte::writeUnsigned($out, $this->mode);
 		CommonTypes::putBool($out, $this->onGround);
 		CommonTypes::putActorRuntimeId($out, $this->ridingActorRuntimeId);
-		if($this->mode === MovePlayerPacket::MODE_TELEPORT){
+		$hasTeleportData = $this->teleportCause !== null && $this->teleportItem !== null;
+		CommonTypes::putBool($out, $hasTeleportData);
+		if($this->teleportCause !== null && $this->teleportItem !== null){
 			LE::writeSignedInt($out, $this->teleportCause);
 			LE::writeSignedInt($out, $this->teleportItem);
 		}

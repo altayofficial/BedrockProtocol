@@ -1,13 +1,24 @@
 <?php
 
 /*
- * This file is part of BedrockProtocol.
- * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
  *
- * BedrockProtocol is free software: you can redistribute it and/or modify
+ *      _    _ _
+ *     / \  | | |_ __ _ _   _
+ *    / _ \ | | __/ _` | | | |
+ *   / ___ \| | || (_| | |_| |
+ *  /_/   \_\_|\__\__,_|\__, |
+ *                       |___/
+ *
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * Original work by the PocketMine Team.
+ * https://www.pocketmine.net/
+ *
+ * @author Altay Team
+ * @link https://github.com/altayofficial
  */
 
 declare(strict_types=1);
@@ -23,28 +34,18 @@ use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
  */
 final class PresenceInfo{
 	public function __construct(
-		private ?string $experienceName,
-		private ?string $worldName,
-		private string $richPresenceId
+		private ?string $richPresenceId
 	){}
 
-	public function getExperienceName() : ?string{ return $this->experienceName; }
-
-	public function getWorldName() : ?string{ return $this->worldName; }
-
-	public function getRichPresenceId() : string{ return $this->richPresenceId; }
+	public function getRichPresenceId() : ?string{ return $this->richPresenceId; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$experienceName = CommonTypes::readOptional($in, CommonTypes::getString(...));
-		$worldName = CommonTypes::readOptional($in, CommonTypes::getString(...));
-		$richPresenceId = CommonTypes::getString($in);
+		$richPresenceId = CommonTypes::readOptional($in, CommonTypes::getString(...));
 
-		return new self($experienceName, $worldName, $richPresenceId);
+		return new self($richPresenceId);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::writeOptional($out, $this->experienceName, CommonTypes::putString(...));
-		CommonTypes::writeOptional($out, $this->worldName, CommonTypes::putString(...));
-		CommonTypes::putString($out, $this->richPresenceId);
+		CommonTypes::writeOptional($out, $this->richPresenceId, CommonTypes::putString(...));
 	}
 }

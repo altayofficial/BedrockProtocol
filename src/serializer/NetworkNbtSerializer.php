@@ -1,19 +1,32 @@
 <?php
 
 /*
- * This file is part of BedrockProtocol.
- * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
  *
- * BedrockProtocol is free software: you can redistribute it and/or modify
+ *      _    _ _
+ *     / \  | | |_ __ _ _   _
+ *    / _ \ | | __/ _` | | | |
+ *   / ___ \| | || (_| | |_| |
+ *  /_/   \_\_|\__\__,_|\__, |
+ *                       |___/
+ *
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * Original work by the PocketMine Team.
+ * https://www.pocketmine.net/
+ *
+ * @author Altay Team
+ * @link https://github.com/altayofficial
  */
 
 declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\serializer;
 
+use pmmp\encoding\LE;
+use pmmp\encoding\VarInt;
 use pocketmine\nbt\BaseNbtSerializer;
 use pocketmine\nbt\NbtDataException;
 use function count;
@@ -22,56 +35,56 @@ use function strlen;
 class NetworkNbtSerializer extends BaseNbtSerializer{
 
 	public function readShort() : int{
-		return $this->buffer->getLShort();
+		return LE::readUnsignedShort($this->reader);
 	}
 
 	public function readSignedShort() : int{
-		return $this->buffer->getSignedLShort();
+		return LE::readSignedShort($this->reader);
 	}
 
 	public function writeShort(int $v) : void{
-		$this->buffer->putLShort($v);
+		LE::writeUnsignedShort($this->writer, $v & 0xffff);
 	}
 
 	public function readInt() : int{
-		return $this->buffer->getVarInt();
+		return VarInt::readSignedInt($this->reader);
 	}
 
 	public function writeInt(int $v) : void{
-		$this->buffer->putVarInt($v);
+		VarInt::writeSignedInt($this->writer, $v);
 	}
 
 	public function readLong() : int{
-		return $this->buffer->getVarLong();
+		return VarInt::readSignedLong($this->reader);
 	}
 
 	public function writeLong(int $v) : void{
-		$this->buffer->putVarLong($v);
+		VarInt::writeSignedLong($this->writer, $v);
 	}
 
 	public function readString() : string{
-		return $this->buffer->get(self::checkReadStringLength($this->buffer->getUnsignedVarInt()));
+		return $this->reader->readByteArray(self::checkReadStringLength(VarInt::readUnsignedInt($this->reader)));
 	}
 
 	public function writeString(string $v) : void{
-		$this->buffer->putUnsignedVarInt(self::checkWriteStringLength(strlen($v)));
-		$this->buffer->put($v);
+		VarInt::writeUnsignedInt($this->writer, self::checkWriteStringLength(strlen($v)));
+		$this->writer->writeByteArray($v);
 	}
 
 	public function readFloat() : float{
-		return $this->buffer->getLFloat();
+		return LE::readFloat($this->reader);
 	}
 
 	public function writeFloat(float $v) : void{
-		$this->buffer->putLFloat($v);
+		LE::writeFloat($this->writer, $v);
 	}
 
 	public function readDouble() : float{
-		return $this->buffer->getLDouble();
+		return LE::readDouble($this->reader);
 	}
 
 	public function writeDouble(float $v) : void{
-		$this->buffer->putLDouble($v);
+		LE::writeDouble($this->writer, $v);
 	}
 
 	public function readIntArray() : array{

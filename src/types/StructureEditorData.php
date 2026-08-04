@@ -1,18 +1,36 @@
 <?php
 
 /*
- * This file is part of BedrockProtocol.
- * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
  *
- * BedrockProtocol is free software: you can redistribute it and/or modify
+ *      _    _ _
+ *     / \  | | |_ __ _ _   _
+ *    / _ \ | | __/ _` | | | |
+ *   / ___ \| | || (_| | |_| |
+ *  /_/   \_\_|\__\__,_|\__, |
+ *                       |___/
+ *
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * Original work by the PocketMine Team.
+ * https://www.pocketmine.net/
+ *
+ * @author Altay Team
+ * @link https://github.com/altayofficial
  */
 
 declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types;
+
+use pmmp\encoding\Byte;
+use pmmp\encoding\ByteBufferReader;
+use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\DataDecodeException;
+use pmmp\encoding\VarInt;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
 class StructureEditorData{
 	public const TYPE_DATA = 0;
@@ -30,4 +48,35 @@ class StructureEditorData{
 	public int $structureBlockType;
 	public StructureSettings $structureSettings;
 	public int $structureRedstoneSaveMode;
+
+	/** @throws DataDecodeException */
+	public static function read(ByteBufferReader $in) : self{
+		$result = new self();
+
+		$result->structureName = CommonTypes::getString($in);
+		$result->filteredStructureName = CommonTypes::getString($in);
+		$result->structureDataField = CommonTypes::getString($in);
+
+		$result->includePlayers = CommonTypes::getBool($in);
+		$result->showBoundingBox = CommonTypes::getBool($in);
+
+		$result->structureBlockType = VarInt::readSignedInt($in);
+		$result->structureSettings = CommonTypes::getStructureSettings($in);
+		$result->structureRedstoneSaveMode = Byte::readUnsigned($in);
+
+		return $result;
+	}
+
+	public function write(ByteBufferWriter $out) : void{
+		CommonTypes::putString($out, $this->structureName);
+		CommonTypes::putString($out, $this->filteredStructureName);
+		CommonTypes::putString($out, $this->structureDataField);
+
+		CommonTypes::putBool($out, $this->includePlayers);
+		CommonTypes::putBool($out, $this->showBoundingBox);
+
+		VarInt::writeSignedInt($out, $this->structureBlockType);
+		CommonTypes::putStructureSettings($out, $this->structureSettings);
+		Byte::writeUnsigned($out, $this->structureRedstoneSaveMode);
+	}
 }
