@@ -106,7 +106,10 @@ class UseItemTransactionData extends TransactionData{
 	 * @throws PacketDecodeException
 	 */
 	public function decodeFromItemInteraction(ByteBufferReader $in) : void{
-		if(CommonTypes::getBool($in) && CommonTypes::getBool($in)){
+		$hasActions = CommonTypes::getBool($in);
+		$hasTransactionData = CommonTypes::getBool($in);
+
+		if($hasActions && $hasTransactionData){
 			$actionCount = VarInt::readUnsignedInt($in);
 			for($i = 0; $i < $actionCount; ++$i){
 				$this->actions[] = (new NetworkInventoryAction())->read($in);

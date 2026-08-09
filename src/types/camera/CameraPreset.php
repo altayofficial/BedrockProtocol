@@ -61,6 +61,8 @@ final class CameraPreset{
 		private ?bool $playerEffects,
 		private ?CameraPresetAimAssist $aimAssist,
 		private ?ControlScheme $controlScheme,
+		private bool $applyInheritedStartingRotation,
+		private ?Vector2 $startingRotation
 	){}
 
 	public function getName() : string{ return $this->name; }
@@ -107,6 +109,10 @@ final class CameraPreset{
 
 	public function getControlScheme() : ?ControlScheme{ return $this->controlScheme; }
 
+	public function getApplyInheritedStartingRotation() : bool{ return $this->applyInheritedStartingRotation; }
+
+	public function getStartingRotation() : ?Vector2{ return $this->startingRotation; }
+
 	public static function read(ByteBufferReader $in) : self{
 		$name = CommonTypes::getString($in);
 		$parent = CommonTypes::getString($in);
@@ -130,6 +136,8 @@ final class CameraPreset{
 		$playerEffects = CommonTypes::readOptional($in, CommonTypes::getBool(...));
 		$aimAssist = CommonTypes::readOptional($in, fn() => CameraPresetAimAssist::read($in));
 		$controlScheme = CommonTypes::readOptional($in, fn() => ControlScheme::fromPacket(Byte::readUnsigned($in)));
+		$applyInheritedStartingRotation = CommonTypes::getBool($in);
+		$startingRotation = CommonTypes::readOptional($in, CommonTypes::getVector2(...));
 
 		return new self(
 			$name,
@@ -153,7 +161,9 @@ final class CameraPreset{
 			$audioListenerType,
 			$playerEffects,
 			$aimAssist,
-			$controlScheme
+			$controlScheme,
+			$applyInheritedStartingRotation,
+			$startingRotation
 		);
 	}
 
@@ -180,5 +190,7 @@ final class CameraPreset{
 		CommonTypes::writeOptional($out, $this->playerEffects, CommonTypes::putBool(...));
 		CommonTypes::writeOptional($out, $this->aimAssist, fn(ByteBufferWriter $out, CameraPresetAimAssist $v) => $v->write($out));
 		CommonTypes::writeOptional($out, $this->controlScheme, fn(ByteBufferWriter $out, ControlScheme $v) => Byte::writeUnsigned($out, $v->value));
+		CommonTypes::putBool($out, $this->applyInheritedStartingRotation);
+		CommonTypes::writeOptional($out, $this->startingRotation, CommonTypes::putVector2(...));
 	}
 }

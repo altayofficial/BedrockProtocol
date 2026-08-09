@@ -486,4 +486,6 @@ interface PacketHandlerInterface{
 	public function handleSendPartyDestinationCookie(SendPartyDestinationCookiePacket $packet) : bool;
 
 	public function handlePartyDestinationCookieResponse(PartyDestinationCookieResponsePacket $packet) : bool;
+
+	public function handleSetPlayerFurnaceOptions(SetPlayerFurnaceOptionsPacket $packet) : bool;
 }

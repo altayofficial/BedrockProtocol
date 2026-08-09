@@ -29,6 +29,7 @@ use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\DataDecodeException;
 use pmmp\encoding\LE;
+use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
 class MoveActorDeltaPacket extends DataPacket implements ClientboundPacket{
@@ -45,6 +46,7 @@ class MoveActorDeltaPacket extends DataPacket implements ClientboundPacket{
 	public bool $teleport = false;
 	public bool $forceMoveLocalEntity = false;
 	public bool $forceCompletion = false;
+	public int $ticks = 0;
 
 	/**
 	 * @generate-create-func
@@ -61,6 +63,7 @@ class MoveActorDeltaPacket extends DataPacket implements ClientboundPacket{
 		bool $teleport,
 		bool $forceMoveLocalEntity,
 		bool $forceCompletion,
+		int $ticks
 	) : self{
 		$result = new self;
 		$result->actorRuntimeId = $actorRuntimeId;
@@ -74,6 +77,7 @@ class MoveActorDeltaPacket extends DataPacket implements ClientboundPacket{
 		$result->teleport = $teleport;
 		$result->forceMoveLocalEntity = $forceMoveLocalEntity;
 		$result->forceCompletion = $forceCompletion;
+		$result->ticks = $ticks;
 		return $result;
 	}
 
@@ -105,6 +109,7 @@ class MoveActorDeltaPacket extends DataPacket implements ClientboundPacket{
 		$this->teleport = CommonTypes::getBool($in);
 		$this->forceMoveLocalEntity = CommonTypes::getBool($in);
 		$this->forceCompletion = CommonTypes::getBool($in);
+		$this->ticks = VarInt::readUnsignedLong($in);
 	}
 
 	private static function maybeWriteCoord(ByteBufferWriter $out, ?float $val) : void{
@@ -133,6 +138,7 @@ class MoveActorDeltaPacket extends DataPacket implements ClientboundPacket{
 		CommonTypes::putBool($out, $this->teleport);
 		CommonTypes::putBool($out, $this->forceMoveLocalEntity);
 		CommonTypes::putBool($out, $this->forceCompletion);
+		VarInt::writeUnsignedLong($out, $this->ticks);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{
