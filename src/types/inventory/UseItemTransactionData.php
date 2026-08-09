@@ -28,12 +28,15 @@ namespace pocketmine\network\mcpe\protocol\types\inventory;
 use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\DataDecodeException;
 use pmmp\encoding\VarInt;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
+use pocketmine\network\mcpe\protocol\PacketDecodeException;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\types\GetTypeIdFromConstTrait;
+use function count;
 
 class UseItemTransactionData extends TransactionData{
 	use GetTypeIdFromConstTrait;
@@ -94,6 +97,33 @@ class UseItemTransactionData extends TransactionData{
 	public function getClientInteractPrediction() : PredictedResult{ return $this->clientInteractPrediction; }
 
 	public function getClientCooldownState() : int{ return $this->clientCooldownState; }
+
+	/**
+	 * PlayerAuthInputPacket frames this transaction differently from InventoryTransactionPacket: the action list is
+	 * optional, but the fields after it are always present.
+	 *
+	 * @throws DataDecodeException
+	 * @throws PacketDecodeException
+	 */
+	public function decodeFromItemInteraction(ByteBufferReader $in) : void{
+		if(CommonTypes::getBool($in) && CommonTypes::getBool($in)){
+			$actionCount = VarInt::readUnsignedInt($in);
+			for($i = 0; $i < $actionCount; ++$i){
+				$this->actions[] = (new NetworkInventoryAction())->read($in);
+			}
+		}
+		$this->decodeData($in);
+	}
+
+	public function encodeForItemInteraction(ByteBufferWriter $out) : void{
+		CommonTypes::putBool($out, true);
+		CommonTypes::putBool($out, true);
+		VarInt::writeUnsignedInt($out, count($this->actions));
+		foreach($this->actions as $action){
+			$action->write($out);
+		}
+		$this->encodeData($out);
+	}
 
 	protected function decodeData(ByteBufferReader $in) : void{
 		$this->actionType = VarInt::readUnsignedInt($in);

@@ -37,10 +37,8 @@ use pocketmine\network\mcpe\protocol\types\InputMode;
 use pocketmine\network\mcpe\protocol\types\InteractionMode;
 use pocketmine\network\mcpe\protocol\types\inventory\stackrequest\ItemStackRequest;
 use pocketmine\network\mcpe\protocol\types\ItemInteractionData;
-use pocketmine\network\mcpe\protocol\types\PlayerAction;
 use pocketmine\network\mcpe\protocol\types\PlayerAuthInputFlags;
 use pocketmine\network\mcpe\protocol\types\PlayerBlockAction;
-use pocketmine\network\mcpe\protocol\types\PlayerBlockActionStopBreak;
 use pocketmine\network\mcpe\protocol\types\PlayerBlockActionWithBlockInfo;
 use pocketmine\network\mcpe\protocol\types\PlayMode;
 use function count;
@@ -317,11 +315,9 @@ class PlayerAuthInputPacket extends DataPacket implements ServerboundPacket{
 				$max = VarInt::readUnsignedInt($in);
 				for($i = 0; $i < $max; ++$i){
 					$actionType = VarInt::readSignedInt($in);
-					$blockActions[] = match(true){
-						PlayerBlockActionWithBlockInfo::isValidActionType($actionType) => PlayerBlockActionWithBlockInfo::read($in, $actionType),
-						$actionType === PlayerAction::STOP_BREAK => new PlayerBlockActionStopBreak(),
-						default => throw new PacketDecodeException("Unexpected block action type $actionType")
-					};
+					//every action carries block info since 1.26.40 - previously only a subset did, and STOP_BREAK
+					//carried nothing at all
+					$blockActions[] = PlayerBlockActionWithBlockInfo::read($in, $actionType);
 				}
 				return $blockActions;
 			});
