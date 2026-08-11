@@ -310,7 +310,19 @@ final class CommonTypes{
 
 	public static function putNetworkItemStackDescriptor(ByteBufferWriter $out, ItemStackWrapper $itemStackWrapper) : void{
 		LE::writeSignedShort($out, $itemStackWrapper->getItemStack()->getId());
-		LE::writeUnsignedShort($out, $itemStackWrapper->getItemStack()->getCount());
+
+		$itemStackCount = $itemStackWrapper->getItemStack()->getCount();
+		if($itemStackCount < 0 || $itemStackCount > 64) {
+			throw new PacketDecodeException("Item stack count range should be in 0-64, " . $itemStackCount . " given");
+		}
+
+		LE::writeUnsignedShort($out, $itemStackCount);
+
+		$itemStackMeta = $itemStackWrapper->getItemStack()->getMeta();
+		if($itemStackMeta < 0 || $itemStackMeta > 32767) {
+			throw new PacketDecodeException("Item stack meta range should be in 0-32767, " . $itemStackMeta . " given");
+		}
+
 		VarInt::writeUnsignedInt($out, $itemStackWrapper->getItemStack()->getMeta());
 
 		self::putBool($out, $hasNetId = $itemStackWrapper->getStackId() !== 0);
@@ -318,7 +330,12 @@ final class CommonTypes{
 			VarInt::writeSignedInt($out, $itemStackWrapper->getStackId());
 		}
 
-		VarInt::writeUnsignedInt($out, $itemStackWrapper->getItemStack()->getBlockRuntimeId());
+		$itemStackBlockRuntimeId = $itemStackWrapper->getItemStack()->getBlockRuntimeId();
+		if($itemStackBlockRuntimeId < 0) {
+			throw new PacketDecodeException("Item stack block runtime id should be bigger than 0, " . $itemStackBlockRuntimeId . " given");
+		}
+
+		VarInt::writeUnsignedInt($out, $itemStackBlockRuntimeId);
 		self::putString($out, $itemStackWrapper->getItemStack()->getRawExtraData());
 	}
 

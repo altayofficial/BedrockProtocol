@@ -52,7 +52,7 @@ class PlayerListPacket extends DataPacket implements ClientboundPacket{
 	 * @generate-create-func
 	 * @param PlayerListEntry[] $entries
 	 */
-	private static function create(int $type, array $entries) : self{
+	public static function create(int $type, array $entries) : self{
 		$result = new self;
 		$result->type = $type;
 		$result->entries = $entries;

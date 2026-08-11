@@ -48,7 +48,7 @@ final class Experiments{
 
 	public static function read(ByteBufferReader $in) : self{
 		$experiments = [];
-		for($i = 0, $len = LE::readUnsignedInt($in); $i < $len; ++$i){
+		for($i = 0, $len = LE::readUnsignedInt($in); $i < $len; ++$i){ //BLAMEMOJANG: why the fuck is this different from other array decodings???
 			$experimentName = CommonTypes::getString($in);
 			$enabled = CommonTypes::getBool($in);
 			$experiments[$experimentName] = $enabled;

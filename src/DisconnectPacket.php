@@ -34,8 +34,8 @@ class DisconnectPacket extends DataPacket implements ClientboundPacket, Serverbo
 	public const NETWORK_ID = ProtocolInfo::DISCONNECT_PACKET;
 
 	public int $reason;
-	public ?string $message;
-	public ?string $filteredMessage;
+	public ?string $message; // TODO: protocol docs compatibility, should be a new class named DisconnectPacketMessages but needs BC break
+	public ?string $filteredMessage; // same here
 
 	/**
 	 * @generate-create-func

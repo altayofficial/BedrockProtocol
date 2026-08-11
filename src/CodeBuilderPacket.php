@@ -32,35 +32,27 @@ use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 class CodeBuilderPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::CODE_BUILDER_PACKET;
 
-	private string $url;
-	private bool $openCodeBuilder;
+	public string $url;
+	public bool $shouldOpenCodeBuilder;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(string $url, bool $openCodeBuilder) : self{
+	public static function create(string $url, bool $shouldOpenCodeBuilder) : self{
 		$result = new self;
 		$result->url = $url;
-		$result->openCodeBuilder = $openCodeBuilder;
+		$result->shouldOpenCodeBuilder = $shouldOpenCodeBuilder;
 		return $result;
-	}
-
-	public function getUrl() : string{
-		return $this->url;
-	}
-
-	public function openCodeBuilder() : bool{
-		return $this->openCodeBuilder;
 	}
 
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$this->url = CommonTypes::getString($in);
-		$this->openCodeBuilder = CommonTypes::getBool($in);
+		$this->shouldOpenCodeBuilder = CommonTypes::getBool($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
 		CommonTypes::putString($out, $this->url);
-		CommonTypes::putBool($out, $this->openCodeBuilder);
+		CommonTypes::putBool($out, $this->shouldOpenCodeBuilder);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

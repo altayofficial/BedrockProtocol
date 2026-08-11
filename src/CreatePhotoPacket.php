@@ -33,35 +33,29 @@ use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 class CreatePhotoPacket extends DataPacket implements ServerboundPacket{
 	public const NETWORK_ID = ProtocolInfo::CREATE_PHOTO_PACKET;
 
-	private int $actorUniqueId;
+	private int $rawId;
 	private string $photoName;
 	private string $photoItemName;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(int $actorUniqueId, string $photoName, string $photoItemName) : self{
+	public static function create(int $rawId, string $photoName, string $photoItemName) : self{
 		$result = new self;
-		$result->actorUniqueId = $actorUniqueId;
+		$result->rawId = $rawId;
 		$result->photoName = $photoName;
 		$result->photoItemName = $photoItemName;
 		return $result;
 	}
 
-	public function getActorUniqueId() : int{ return $this->actorUniqueId; }
-
-	public function getPhotoName() : string{ return $this->photoName; }
-
-	public function getPhotoItemName() : string{ return $this->photoItemName; }
-
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->actorUniqueId = LE::readSignedLong($in); //why be consistent mojang ?????
+		$this->rawId = LE::readSignedLong($in);
 		$this->photoName = CommonTypes::getString($in);
 		$this->photoItemName = CommonTypes::getString($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		LE::writeSignedLong($out, $this->actorUniqueId);
+		LE::writeSignedLong($out, $this->rawId);
 		CommonTypes::putString($out, $this->photoName);
 		CommonTypes::putString($out, $this->photoItemName);
 	}

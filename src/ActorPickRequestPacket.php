@@ -35,30 +35,30 @@ class ActorPickRequestPacket extends DataPacket implements ServerboundPacket{
 	public const NETWORK_ID = ProtocolInfo::ACTOR_PICK_REQUEST_PACKET;
 
 	public int $actorUniqueId;
-	public int $hotbarSlot;
-	public bool $addUserData;
+	public int $maxSlots;
+	public bool $withData;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(int $actorUniqueId, int $hotbarSlot, bool $addUserData) : self{
+	public static function create(int $actorUniqueId, int $maxSlots, bool $withData) : self{
 		$result = new self;
 		$result->actorUniqueId = $actorUniqueId;
-		$result->hotbarSlot = $hotbarSlot;
-		$result->addUserData = $addUserData;
+		$result->maxSlots = $maxSlots;
+		$result->withData = $withData;
 		return $result;
 	}
 
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$this->actorUniqueId = LE::readSignedLong($in);
-		$this->hotbarSlot = Byte::readUnsigned($in);
-		$this->addUserData = CommonTypes::getBool($in);
+		$this->maxSlots = Byte::readUnsigned($in);
+		$this->withData = CommonTypes::getBool($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
 		LE::writeSignedLong($out, $this->actorUniqueId);
-		Byte::writeUnsigned($out, $this->hotbarSlot);
-		CommonTypes::putBool($out, $this->addUserData);
+		Byte::writeUnsigned($out, $this->maxSlots);
+		CommonTypes::putBool($out, $this->withData);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

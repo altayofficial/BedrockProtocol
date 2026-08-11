@@ -35,30 +35,30 @@ class BlockPickRequestPacket extends DataPacket implements ServerboundPacket{
 	public const NETWORK_ID = ProtocolInfo::BLOCK_PICK_REQUEST_PACKET;
 
 	public BlockPosition $blockPosition;
-	public bool $addUserData = false;
-	public int $hotbarSlot;
+	public bool $withData = false;
+	public int $maxSlots;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(BlockPosition $blockPosition, bool $addUserData, int $hotbarSlot) : self{
+	public static function create(BlockPosition $blockPosition, bool $withData, int $maxSlots) : self{
 		$result = new self;
 		$result->blockPosition = $blockPosition;
-		$result->addUserData = $addUserData;
-		$result->hotbarSlot = $hotbarSlot;
+		$result->withData = $withData;
+		$result->maxSlots = $maxSlots;
 		return $result;
 	}
 
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$this->blockPosition = CommonTypes::getBlockPosition($in);
-		$this->addUserData = CommonTypes::getBool($in);
-		$this->hotbarSlot = Byte::readUnsigned($in);
+		$this->withData = CommonTypes::getBool($in);
+		$this->maxSlots = Byte::readUnsigned($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
 		CommonTypes::putBlockPosition($out, $this->blockPosition);
-		CommonTypes::putBool($out, $this->addUserData);
-		Byte::writeUnsigned($out, $this->hotbarSlot);
+		CommonTypes::putBool($out, $this->withData);
+		Byte::writeUnsigned($out, $this->maxSlots);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

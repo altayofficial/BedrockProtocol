@@ -38,18 +38,18 @@ class AddPaintingPacket extends DataPacket implements ClientboundPacket{
 	public int $actorRuntimeId;
 	public Vector3 $position;
 	public int $direction;
-	public string $title;
+	public string $motif;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(int $actorUniqueId, int $actorRuntimeId, Vector3 $position, int $direction, string $title) : self{
+	public static function create(int $actorUniqueId, int $actorRuntimeId, Vector3 $position, int $direction, string $motif) : self{
 		$result = new self;
 		$result->actorUniqueId = $actorUniqueId;
 		$result->actorRuntimeId = $actorRuntimeId;
 		$result->position = $position;
 		$result->direction = $direction;
-		$result->title = $title;
+		$result->motif = $motif;
 		return $result;
 	}
 
@@ -58,7 +58,7 @@ class AddPaintingPacket extends DataPacket implements ClientboundPacket{
 		$this->actorRuntimeId = CommonTypes::getActorRuntimeId($in);
 		$this->position = CommonTypes::getVector3($in);
 		$this->direction = VarInt::readSignedInt($in);
-		$this->title = CommonTypes::getString($in);
+		$this->motif = CommonTypes::getString($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
@@ -66,7 +66,7 @@ class AddPaintingPacket extends DataPacket implements ClientboundPacket{
 		CommonTypes::putActorRuntimeId($out, $this->actorRuntimeId);
 		CommonTypes::putVector3($out, $this->position);
 		VarInt::writeSignedInt($out, $this->direction);
-		CommonTypes::putString($out, $this->title);
+		CommonTypes::putString($out, $this->motif);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{
