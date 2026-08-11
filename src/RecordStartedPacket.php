@@ -25,29 +25,21 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol;
 
-use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
-use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\BlockPosition;
 
 class RecordStartedPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::RECORD_STARTED_PACKET;
 
-	/** @var BlockPosition */
 	public BlockPosition $blockPosition;
 
-	/** @var int */
 	public int $serverSoundHandle;
 
 	/**
 	 * @generate-create-func
-	 * @param BlockPosition $blockPosition
-	 * @param int           $serverSoundHandle
-	 *
-	 * @return self
 	 */
 	public static function create(BlockPosition $blockPosition, int $serverSoundHandle) : self{
 		$result = new self;

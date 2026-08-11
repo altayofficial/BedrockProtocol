@@ -29,6 +29,7 @@ use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
+use function count;
 
 final class StringArrayPackSetting extends PackSetting{
 	public const ID = PackSettingType::STRING_ARRAY;
@@ -37,7 +38,6 @@ final class StringArrayPackSetting extends PackSetting{
 	private array $value;
 
 	/**
-	 * @param string $name
 	 * @param string[]  $value
 	 */
 	public function __construct(string $name, array $value){
