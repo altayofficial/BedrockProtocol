@@ -31,4 +31,5 @@ enum PackSettingType : int{
 	case FLOAT = 0;
 	case BOOL = 1;
 	case STRING = 2;
+	case STRING_ARRAY = 3;
 }

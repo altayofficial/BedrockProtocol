@@ -28,36 +28,45 @@ namespace pocketmine\network\mcpe\protocol;
 use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pocketmine\network\mcpe\protocol\types\furnace\FurnaceOptions;
-use pocketmine\network\mcpe\protocol\types\furnace\FurnaceType;
+use pmmp\encoding\LE;
+use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
+use pocketmine\network\mcpe\protocol\types\BlockPosition;
 
-class SetPlayerFurnaceOptionsPacket extends DataPacket implements ClientboundPacket, ServerboundPacket{
-	public const NETWORK_ID = ProtocolInfo::SET_PLAYER_FURNACE_OPTIONS_PACKET;
+class RecordStartedPacket extends DataPacket implements ClientboundPacket{
+	public const NETWORK_ID = ProtocolInfo::RECORD_STARTED_PACKET;
 
-	public FurnaceType $furnaceType;
-	public FurnaceOptions $furnaceOptions;
+	/** @var BlockPosition */
+	public BlockPosition $blockPosition;
+
+	/** @var int */
+	public int $serverSoundHandle;
 
 	/**
 	 * @generate-create-func
+	 * @param BlockPosition $blockPosition
+	 * @param int           $serverSoundHandle
+	 *
+	 * @return self
 	 */
-	public static function create(FurnaceType $furnaceType, FurnaceOptions $furnaceOptions) : self{
+	public static function create(BlockPosition $blockPosition, int $serverSoundHandle) : self{
 		$result = new self;
-		$result->furnaceType = $furnaceType;
-		$result->furnaceOptions = $furnaceOptions;
+		$result->blockPosition = $blockPosition;
+		$result->serverSoundHandle = $serverSoundHandle;
 		return $result;
 	}
 
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->furnaceType = FurnaceType::fromPacket(Byte::readUnsigned($in));
-		$this->furnaceOptions = FurnaceOptions::read($in);
+		$this->blockPosition = CommonTypes::getBlockPosition($in);
+		$this->serverSoundHandle = LE::readUnsignedLong($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		Byte::writeUnsigned($out, $this->furnaceType->value);
-		$this->furnaceOptions->write($out);
+		CommonTypes::putBlockPosition($out, $this->blockPosition);
+		LE::writeUnsignedLong($out, $this->serverSoundHandle);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{
-		return $handler->handleSetPlayerFurnaceOptions($this);
+		return $handler->handleRecordStarted($this);
 	}
 }

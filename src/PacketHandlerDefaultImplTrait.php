@@ -953,4 +953,8 @@ trait PacketHandlerDefaultImplTrait{
 		return false;
 	}
 
+	public function handleRecordStarted(RecordStartedPacket $packet) : bool{
+		return false;
+	}
+
 }
