@@ -33,14 +33,12 @@ use function count;
 
 final class DeathCauseMessageType{
 
-	/** @var string */
 	public string $deathCauseAttackName; // BLAMEMOJANG: bad variable name, what is this bro
 
 	/** @var string[] */
 	public array $deathCauseMessageList;
 
 	/**
-	 * @param string $deathCauseAttackName
 	 * @param string[]  $deathCauseMessageList
 	 */
 	public function __construct(
