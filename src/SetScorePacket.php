@@ -57,18 +57,14 @@ class SetScorePacket extends DataPacket implements ClientboundPacket{
 	 */
 	public static function create(array $entries) : self{
 		$result = new self;
-
 		foreach($entries as $entry){
 			//TODO: HACK! Empty strings disconnect clients in 1.26.40
 			$entry->objectiveName = $entry->objectiveName === "" ? " " : $entry->objectiveName;
-
 			if($entry->type === ScorePacketEntry::TYPE_FAKE_PLAYER && $entry->customName === ""){
 				$entry->customName = " ";
 			}
 		}
-
 		$result->entries = $entries;
-
 		return $result;
 	}
 
@@ -76,15 +72,13 @@ class SetScorePacket extends DataPacket implements ClientboundPacket{
 		for($i = 0, $i2 = VarInt::readUnsignedInt($in); $i < $i2; ++$i){
 			$entry = new ScorePacketEntry();
 			$entry->type = VarInt::readUnsignedInt($in);
-
-			CommonTypes::getString($in);
+			CommonTypes::getString($in); //action id, redundant with the type
 
 			switch($entry->type){
 				case ScorePacketEntry::TYPE_REMOVE:
 					$entry->scoreboardId = VarInt::readSignedLong($in);
 					$entry->objectiveName = CommonTypes::readOptional($in, CommonTypes::getString(...));
 					break;
-
 				case ScorePacketEntry::TYPE_PLAYER:
 				case ScorePacketEntry::TYPE_ENTITY:
 					$entry->scoreboardId = VarInt::readSignedLong($in);
@@ -92,18 +86,15 @@ class SetScorePacket extends DataPacket implements ClientboundPacket{
 					$entry->score = LE::readSignedInt($in);
 					$entry->actorUniqueId = CommonTypes::getActorUniqueId($in);
 					break;
-
 				case ScorePacketEntry::TYPE_FAKE_PLAYER:
 					$entry->scoreboardId = VarInt::readSignedLong($in);
 					$entry->objectiveName = CommonTypes::getString($in);
 					$entry->score = LE::readSignedInt($in);
 					$entry->customName = CommonTypes::getString($in);
 					break;
-
 				default:
 					throw new PacketDecodeException("Unknown entry type $entry->type");
 			}
-
 			$this->entries[] = $entry;
 		}
 	}
@@ -113,16 +104,13 @@ class SetScorePacket extends DataPacket implements ClientboundPacket{
 
 		foreach($this->entries as $entry){
 			$actionId = self::ACTION_IDS[$entry->type] ?? throw new \InvalidArgumentException("Unknown entry type $entry->type");
-
 			VarInt::writeUnsignedInt($out, $entry->type);
 			CommonTypes::putString($out, $actionId);
-
 			switch($entry->type){
 				case ScorePacketEntry::TYPE_REMOVE:
 					VarInt::writeSignedLong($out, $entry->scoreboardId);
 					CommonTypes::writeOptional($out, $entry->objectiveName, CommonTypes::putString(...));
 					break;
-
 				case ScorePacketEntry::TYPE_PLAYER:
 				case ScorePacketEntry::TYPE_ENTITY:
 					VarInt::writeSignedLong($out, $entry->scoreboardId);
@@ -130,7 +118,6 @@ class SetScorePacket extends DataPacket implements ClientboundPacket{
 					LE::writeSignedInt($out, $entry->score);
 					CommonTypes::putActorUniqueId($out, $entry->actorUniqueId);
 					break;
-
 				case ScorePacketEntry::TYPE_FAKE_PLAYER:
 					VarInt::writeSignedLong($out, $entry->scoreboardId);
 					CommonTypes::putString($out, $entry->objectiveName ?? throw new \InvalidArgumentException("objectiveName must be set for this entry type"));

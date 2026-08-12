@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol;
 
-use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
@@ -59,14 +58,14 @@ class LegacyTelemetryEventPacket extends DataPacket implements ClientboundPacket
 
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$this->targetActorId = CommonTypes::getActorUniqueId($in);
-		$this->type = LegacyTelemetryEventType::fromPacket(Byte::readUnsigned($in));
+		$this->type = LegacyTelemetryEventType::fromPacket(VarInt::readUnsignedInt($in));
 		$this->usePlayerId = CommonTypes::getBool($in);
 		$this->eventData = VarInt::readSignedInt($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
 		CommonTypes::putActorRuntimeId($out, $this->targetActorId);
-		Byte::writeUnsigned($out, $this->type->value);
+		VarInt::writeUnsignedInt($out, $this->type->value);
 		CommonTypes::putBool($out, $this->usePlayerId);
 		VarInt::writeSignedInt($out, $this->eventData);
 	}

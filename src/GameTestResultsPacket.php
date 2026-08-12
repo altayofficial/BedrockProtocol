@@ -38,11 +38,6 @@ class GameTestResultsPacket extends DataPacket implements ClientboundPacket{
 
 	/**
 	 * @generate-create-func
-	 * @param bool   $succeeded
-	 * @param string $error
-	 * @param string $testName
-	 *
-	 * @return self
 	 */
 	public static function create(bool $succeeded, string $error, string $testName) : self{
 		$result = new self;
