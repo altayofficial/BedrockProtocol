@@ -50,14 +50,6 @@ class GraphicsOverrideParameterPacket extends DataPacket implements ClientboundP
 
 	/**
 	 * @param ParameterKeyframeValue[]      $parameterKeyframeValues
-	 * @param float|null                    $floatValue
-	 * @param Vector3|null                  $vec3Value
-	 * @param string                        $biomeIdentifier
-	 * @param string|null                   $playerIdentifier
-	 * @param GraphicsOverrideParameterType $parameterType
-	 * @param bool                          $resetParameter
-	 *
-	 * @return self
 	 */
 	public static function create(
 		array $parameterKeyframeValues,
