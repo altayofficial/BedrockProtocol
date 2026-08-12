@@ -33,9 +33,9 @@ use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 class EditorNetworkPacket extends DataPacket implements ClientboundPacket, ServerboundPacket{
 	public const NETWORK_ID = ProtocolInfo::EDITOR_NETWORK_PACKET;
 
-	private bool $routeToManager;
+	public bool $routeToManager;
 	/** @phpstan-var CacheableNbt<\pocketmine\nbt\tag\CompoundTag> */
-	private CacheableNbt $payload;
+	public CacheableNbt $payload;
 
 	/**
 	 * @generate-create-func

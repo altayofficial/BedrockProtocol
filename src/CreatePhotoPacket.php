@@ -33,9 +33,9 @@ use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 class CreatePhotoPacket extends DataPacket implements ServerboundPacket{
 	public const NETWORK_ID = ProtocolInfo::CREATE_PHOTO_PACKET;
 
-	private int $rawId;
-	private string $photoName;
-	private string $photoItemName;
+	public int $rawId;
+	public string $photoName;
+	public string $photoItemName;
 
 	/**
 	 * @generate-create-func

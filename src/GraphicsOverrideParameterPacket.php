@@ -40,13 +40,13 @@ class GraphicsOverrideParameterPacket extends DataPacket implements ClientboundP
 	public const NETWORK_ID = ProtocolInfo::GRAPHICS_OVERRIDE_PARAMETER_PACKET;
 
 	/** @var ParameterKeyframeValue[] */
-	private array $parameterKeyframeValues = [];
-	private ?float $floatValue;
-	private ?Vector3 $vec3Value; //BLAMEMOJANG: bad naming, but let's do it for now
-	private string $biomeIdentifier;
-	private ?string $playerIdentifier;
-	private GraphicsOverrideParameterType $parameterType;
-	private bool $resetParameter;
+	public array $parameterKeyframeValues = [];
+	public ?float $floatValue;
+	public ?Vector3 $vec3Value; //BLAMEMOJANG: bad naming, but let's do it for now
+	public string $biomeIdentifier;
+	public ?string $playerIdentifier;
+	public GraphicsOverrideParameterType $parameterType;
+	public bool $resetParameter;
 
 	/**
 	 * @param ParameterKeyframeValue[]      $parameterKeyframeValues

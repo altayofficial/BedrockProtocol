@@ -37,9 +37,9 @@ use pocketmine\network\mcpe\protocol\types\LessonAction;
 class LessonProgressPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::LESSON_PROGRESS_PACKET;
 
-	private LessonAction $lessonAction;
-	private int $score;
-	private string $activityId;
+	public LessonAction $lessonAction;
+	public int $score;
+	public string $activityId;
 
 	/**
 	 * @generate-create-func

@@ -38,13 +38,13 @@ use pocketmine\network\mcpe\protocol\types\RewindType;
 class CorrectPlayerMovePredictionPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::CORRECT_PLAYER_MOVE_PREDICTION_PACKET;
 
-	private RewindType $predictionType;
-	private Vector3 $position;
-	private Vector3 $delta; // posDelta on the protocol docs, their naming is sucks
-	private Vector2 $rotation;
-	private ?float $vehicleAngularVelocity;
-	private bool $onGround;
-	private int $tick;
+	public RewindType $predictionType;
+	public Vector3 $position;
+	public Vector3 $delta; // posDelta on the protocol docs, their naming is sucks
+	public Vector2 $rotation;
+	public ?float $vehicleAngularVelocity;
+	public bool $onGround;
+	public int $tick;
 
 	/**
 	 * @generate-create-func

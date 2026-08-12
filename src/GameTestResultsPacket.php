@@ -32,12 +32,17 @@ use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 class GameTestResultsPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::GAME_TEST_RESULTS_PACKET;
 
-	private bool $succeeded;
-	private string $error;
-	private string $testName;
+	public bool $succeeded;
+	public string $error;
+	public string $testName;
 
 	/**
 	 * @generate-create-func
+	 * @param bool   $succeeded
+	 * @param string $error
+	 * @param string $testName
+	 *
+	 * @return self
 	 */
 	public static function create(bool $succeeded, string $error, string $testName) : self{
 		$result = new self;
