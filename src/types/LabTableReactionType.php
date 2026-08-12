@@ -25,26 +25,20 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types;
 
-use pmmp\encoding\ByteBufferReader;
-use pmmp\encoding\ByteBufferWriter;
-use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
+enum LabTableReactionType : int{
+	use PacketIntEnumTrait;
 
-final class FeatureRegistryPacketEntry{
-
-	public function __construct(
-		private string $featureName,
-		private string $binaryJsonOutput
-	){}
-
-	public static function read(ByteBufferReader $in) : self{
-		$featureName = CommonTypes::getString($in);
-		$binaryJsonOutput = CommonTypes::getString($in);
-
-		return new self($featureName, $binaryJsonOutput);
-	}
-
-	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->featureName);
-		CommonTypes::putString($out, $this->binaryJsonOutput);
-	}
+	case NONE = 0;
+	case ICE_BOMB = 1;
+	case BLEACH = 2;
+	case ELEPHANT_TOOTHPASTE = 3;
+	case FERTILIZER = 4;
+	case HEAT_BLOCK = 5;
+	case MAGNESIUM_SALTS = 6;
+	case MISC_FIRE = 7;
+	case MISC_EXPLOSION = 8;
+	case MISC_LAVA = 9;
+	case MISC_MYSTICAL = 10;
+	case MISC_SMOKE = 11;
+	case MISC_LARGE_SMOKE = 12;
 }

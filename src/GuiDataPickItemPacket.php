@@ -33,30 +33,30 @@ use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 class GuiDataPickItemPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::GUI_DATA_PICK_ITEM_PACKET;
 
-	public string $itemDescription;
-	public string $itemEffects;
+	public string $itemName;
+	public string $itemEffectName;
 	public int $hotbarSlot;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(string $itemDescription, string $itemEffects, int $hotbarSlot) : self{
+	public static function create(string $itemName, string $itemEffectName, int $hotbarSlot) : self{
 		$result = new self;
-		$result->itemDescription = $itemDescription;
-		$result->itemEffects = $itemEffects;
+		$result->itemName = $itemName;
+		$result->itemEffectName = $itemEffectName;
 		$result->hotbarSlot = $hotbarSlot;
 		return $result;
 	}
 
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->itemDescription = CommonTypes::getString($in);
-		$this->itemEffects = CommonTypes::getString($in);
+		$this->itemName = CommonTypes::getString($in);
+		$this->itemEffectName = CommonTypes::getString($in);
 		$this->hotbarSlot = LE::readSignedInt($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->itemDescription);
-		CommonTypes::putString($out, $this->itemEffects);
+		CommonTypes::putString($out, $this->itemName);
+		CommonTypes::putString($out, $this->itemEffectName);
 		LE::writeSignedInt($out, $this->hotbarSlot);
 	}
 

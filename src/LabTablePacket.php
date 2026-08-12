@@ -30,39 +30,37 @@ use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\BlockPosition;
+use pocketmine\network\mcpe\protocol\types\LabTableReactionType;
+use pocketmine\network\mcpe\protocol\types\LabTableType;
 
 class LabTablePacket extends DataPacket implements ClientboundPacket, ServerboundPacket{
 	public const NETWORK_ID = ProtocolInfo::LAB_TABLE_PACKET;
 
-	public const TYPE_START_COMBINE = 0;
-	public const TYPE_START_REACTION = 1;
-	public const TYPE_RESET = 2;
-
-	public int $actionType;
-	public BlockPosition $blockPosition;
-	public int $reactionType;
+	public LabTableType $type;
+	public BlockPosition $position;
+	public LabTableReactionType $reaction;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(int $actionType, BlockPosition $blockPosition, int $reactionType) : self{
+	public static function create(LabTableType $type, BlockPosition $position, LabTableReactionType $reaction) : self{
 		$result = new self;
-		$result->actionType = $actionType;
-		$result->blockPosition = $blockPosition;
-		$result->reactionType = $reactionType;
+		$result->type = $type;
+		$result->position = $position;
+		$result->reaction = $reaction;
 		return $result;
 	}
 
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->actionType = Byte::readUnsigned($in);
-		$this->blockPosition = CommonTypes::getBlockPosition($in);
-		$this->reactionType = Byte::readUnsigned($in);
+		$this->type = LabTableType::fromPacket(Byte::readUnsigned($in));
+		$this->position = CommonTypes::getBlockPosition($in);
+		$this->reaction = LabTableReactionType::fromPacket(Byte::readUnsigned($in));
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		Byte::writeUnsigned($out, $this->actionType);
-		CommonTypes::putBlockPosition($out, $this->blockPosition);
-		Byte::writeUnsigned($out, $this->reactionType);
+		Byte::writeUnsigned($out, $this->type->value);
+		CommonTypes::putBlockPosition($out, $this->position);
+		Byte::writeUnsigned($out, $this->reaction->value);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

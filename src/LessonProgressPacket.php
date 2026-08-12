@@ -29,6 +29,7 @@ use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
+use pocketmine\network\mcpe\protocol\types\LessonAction;
 
 /**
  * Handled only in Education mode. Used to fire telemetry reporting on the client.
@@ -36,39 +37,29 @@ use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 class LessonProgressPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::LESSON_PROGRESS_PACKET;
 
-	public const ACTION_START = 0;
-	public const ACTION_FINISH = 1;
-	public const ACTION_RESTART = 2;
-
-	private int $action;
+	private LessonAction $lessonAction;
 	private int $score;
 	private string $activityId;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(int $action, int $score, string $activityId) : self{
+	public static function create(LessonAction $lessonAction, int $score, string $activityId) : self{
 		$result = new self;
-		$result->action = $action;
+		$result->lessonAction = $lessonAction;
 		$result->score = $score;
 		$result->activityId = $activityId;
 		return $result;
 	}
 
-	public function getAction() : int{ return $this->action; }
-
-	public function getScore() : int{ return $this->score; }
-
-	public function getActivityId() : string{ return $this->activityId; }
-
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->action = VarInt::readSignedInt($in);
+		$this->lessonAction = LessonAction::fromPacket(VarInt::readSignedInt($in));
 		$this->score = VarInt::readSignedInt($in);
 		$this->activityId = CommonTypes::getString($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		VarInt::writeSignedInt($out, $this->action);
+		VarInt::writeSignedInt($out, $this->lessonAction->value);
 		VarInt::writeSignedInt($out, $this->score);
 		CommonTypes::putString($out, $this->activityId);
 	}

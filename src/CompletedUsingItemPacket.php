@@ -51,26 +51,26 @@ class CompletedUsingItemPacket extends DataPacket implements ClientboundPacket{
 	public const ACTION_BRUSHING_COMPLETED = 15;
 
 	public int $itemId;
-	public int $action;
+	public int $itemUseMethod;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(int $itemId, int $action) : self{
+	public static function create(int $itemId, int $itemUseMethod) : self{
 		$result = new self;
 		$result->itemId = $itemId;
-		$result->action = $action;
+		$result->itemUseMethod = $itemUseMethod;
 		return $result;
 	}
 
 	public function decodePayload(ByteBufferReader $in) : void{
 		$this->itemId = LE::readSignedShort($in);
-		$this->action = LE::readSignedInt($in);
+		$this->itemUseMethod = LE::readSignedInt($in);
 	}
 
 	public function encodePayload(ByteBufferWriter $out) : void{
 		LE::writeSignedShort($out, $this->itemId);
-		LE::writeSignedInt($out, $this->action);
+		LE::writeSignedInt($out, $this->itemUseMethod);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

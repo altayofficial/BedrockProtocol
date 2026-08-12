@@ -32,35 +32,29 @@ use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 class GameTestResultsPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::GAME_TEST_RESULTS_PACKET;
 
-	private bool $success;
+	private bool $succeeded;
 	private string $error;
 	private string $testName;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(bool $success, string $error, string $testName) : self{
+	public static function create(bool $succeeded, string $error, string $testName) : self{
 		$result = new self;
-		$result->success = $success;
+		$result->succeeded = $succeeded;
 		$result->error = $error;
 		$result->testName = $testName;
 		return $result;
 	}
 
-	public function isSuccess() : bool{ return $this->success; }
-
-	public function getError() : string{ return $this->error; }
-
-	public function getTestName() : string{ return $this->testName; }
-
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->success = CommonTypes::getBool($in);
+		$this->succeeded = CommonTypes::getBool($in);
 		$this->error = CommonTypes::getString($in);
 		$this->testName = CommonTypes::getString($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		CommonTypes::putBool($out, $this->success);
+		CommonTypes::putBool($out, $this->succeeded);
 		CommonTypes::putString($out, $this->error);
 		CommonTypes::putString($out, $this->testName);
 	}

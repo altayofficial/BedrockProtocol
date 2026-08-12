@@ -43,29 +43,29 @@ class ContainerSetDataPacket extends DataPacket implements ClientboundPacket{
 	public const PROPERTY_BREWING_STAND_FUEL_AMOUNT = 1;
 	public const PROPERTY_BREWING_STAND_FUEL_TOTAL = 2;
 
-	public int $windowId;
-	public int $property;
+	public int $containerId;
+	public int $property; // id in the protocol docs, but this naming is better huh mojang?
 	public int $value;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(int $windowId, int $property, int $value) : self{
+	public static function create(int $containerId, int $property, int $value) : self{
 		$result = new self;
-		$result->windowId = $windowId;
+		$result->containerId = $containerId;
 		$result->property = $property;
 		$result->value = $value;
 		return $result;
 	}
 
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->windowId = Byte::readUnsigned($in);
+		$this->containerId = Byte::readUnsigned($in);
 		$this->property = VarInt::readSignedInt($in);
 		$this->value = VarInt::readSignedInt($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		Byte::writeUnsigned($out, $this->windowId);
+		Byte::writeUnsigned($out, $this->containerId);
 		VarInt::writeSignedInt($out, $this->property);
 		VarInt::writeSignedInt($out, $this->value);
 	}

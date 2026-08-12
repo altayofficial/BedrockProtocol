@@ -33,29 +33,29 @@ class HurtArmorPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::HURT_ARMOR_PACKET;
 
 	public int $cause;
-	public int $health;
+	public int $damage;
 	public int $armorSlotFlags;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(int $cause, int $health, int $armorSlotFlags) : self{
+	public static function create(int $cause, int $damage, int $armorSlotFlags) : self{
 		$result = new self;
 		$result->cause = $cause;
-		$result->health = $health;
+		$result->damage = $damage;
 		$result->armorSlotFlags = $armorSlotFlags;
 		return $result;
 	}
 
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$this->cause = VarInt::readSignedInt($in);
-		$this->health = VarInt::readSignedInt($in);
+		$this->damage = VarInt::readSignedInt($in);
 		$this->armorSlotFlags = VarInt::readUnsignedLong($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
 		VarInt::writeSignedInt($out, $this->cause);
-		VarInt::writeSignedInt($out, $this->health);
+		VarInt::writeSignedInt($out, $this->damage);
 		VarInt::writeUnsignedLong($out, $this->armorSlotFlags);
 	}
 
