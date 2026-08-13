@@ -41,14 +41,14 @@ class MapTrackedObject{
 
 	public static function read(ByteBufferReader $in) : self{
 		$result = new self;
-		$result->type = LE::readUnsignedInt($in);
+		$result->type = LE::readSignedInt($in);
 		$result->actorUniqueId = CommonTypes::readOptional($in, CommonTypes::getActorUniqueId(...));
 		$result->blockPosition = CommonTypes::readOptional($in, CommonTypes::getBlockPosition(...));
 		return $result;
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		LE::writeUnsignedInt($out, $this->type);
+		LE::writeSignedInt($out, $this->type);
 		CommonTypes::writeOptional($out, $this->actorUniqueId, CommonTypes::putActorUniqueId(...));
 		CommonTypes::writeOptional($out, $this->blockPosition, CommonTypes::putBlockPosition(...));
 	}
