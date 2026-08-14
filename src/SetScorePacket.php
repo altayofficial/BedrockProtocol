@@ -58,13 +58,6 @@ class SetScorePacket extends DataPacket implements ClientboundPacket{
 	 */
 	public static function create(array $entries) : self{
 		$result = new self;
-		foreach($entries as $entry){
-			//TODO: HACK! Empty strings disconnect clients in 1.26.40
-			$entry->objectiveName = $entry->objectiveName === "" ? " " : $entry->objectiveName;
-			if($entry->type === ScorePacketEntry::TYPE_FAKE_PLAYER && $entry->customName === ""){
-				$entry->customName = " ";
-			}
-		}
 		$result->entries = $entries;
 		return $result;
 	}
