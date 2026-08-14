@@ -758,12 +758,8 @@ final class CommonTypes{
 		}
 	}
 
-
 	/**
 	 * Credits to @alvin0319
-	 * @param ByteBufferReader $in
-	 *
-	 * @return void
 	 */
 	public static function readDummyOptional(ByteBufferReader $in) : void{
 		$dummy = Byte::readUnsigned($in);
