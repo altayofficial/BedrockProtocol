@@ -76,7 +76,7 @@ final class ItemStackResponseSlotInfo{
 			CommonTypes::writeServerItemStackId($out, $itemStackId);
 		});
 		CommonTypes::putString($out, $this->customName);
-		CommonTypes::putString($out, $this->filteredCustomName)
+		CommonTypes::putString($out, $this->filteredCustomName);
 		VarInt::writeSignedInt($out, $this->durabilityCorrection);
 	}
 }
