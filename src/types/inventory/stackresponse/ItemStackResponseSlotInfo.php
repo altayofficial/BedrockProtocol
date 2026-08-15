@@ -38,7 +38,7 @@ final class ItemStackResponseSlotInfo{
 		private int $count,
 		private ?int $itemStackId,
 		private string $customName,
-		private ?string $filteredCustomName,
+		private string $filteredCustomName,
 		private int $durabilityCorrection
 	){}
 
@@ -52,7 +52,7 @@ final class ItemStackResponseSlotInfo{
 
 	public function getCustomName() : string{ return $this->customName; }
 
-	public function getFilteredCustomName() : ?string{ return $this->filteredCustomName; }
+	public function getFilteredCustomName() : string{ return $this->filteredCustomName; }
 
 	public function getDurabilityCorrection() : int{ return $this->durabilityCorrection; }
 
@@ -76,7 +76,7 @@ final class ItemStackResponseSlotInfo{
 			CommonTypes::writeServerItemStackId($out, $itemStackId);
 		});
 		CommonTypes::putString($out, $this->customName);
-		CommonTypes::writeOptional($out, $this->filteredCustomName, CommonTypes::putString(...));
+		CommonTypes::putString($out, $this->filteredCustomName)
 		VarInt::writeSignedInt($out, $this->durabilityCorrection);
 	}
 }
