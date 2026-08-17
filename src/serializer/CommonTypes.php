@@ -774,4 +774,41 @@ final class CommonTypes{
 			self::putBool($out, false);
 		}
 	}
+
+	/**
+	 * Credits to @alvin0319
+	 */
+	public static function readDummyOptional(ByteBufferReader $in) : void{
+		$dummy = Byte::readUnsigned($in);
+		if($dummy !== 1){
+			throw new PacketDecodeException("Dummy optional first byte should always be 1, got $dummy");
+		}
+	}
+
+	public static function writeDummyOptional(ByteBufferWriter $out) : void{
+		Byte::writeUnsigned($out, 1);
+	}
+
+	/**
+	 * Credits to @alvin0319
+	 * @phpstan-template T
+	 * @phpstan-param \Closure(ByteBufferReader) : T $reader
+	 * @phpstan-return T|null
+	 * @throws DataDecodeException
+	 */
+	public static function readDoubleOptional(ByteBufferReader $in, \Closure $reader) : mixed{
+		self::readDummyOptional($in);
+		return self::readOptional($in, $reader);
+	}
+
+	/**
+	 * Credits to @alvin0319
+	 * @phpstan-template T
+	 * @phpstan-param T|null $value
+	 * @phpstan-param \Closure(ByteBufferWriter, T) : void $writer
+	 */
+	public static function writeDoubleOptional(ByteBufferWriter $out, mixed $value, \Closure $writer) : void{
+		self::writeDummyOptional($out);
+		self::writeOptional($out, $value, $writer);
+	}
 }

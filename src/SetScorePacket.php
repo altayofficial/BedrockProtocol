@@ -57,13 +57,6 @@ class SetScorePacket extends DataPacket implements ClientboundPacket{
 	 */
 	public static function create(array $entries) : self{
 		$result = new self;
-		foreach($entries as $entry){
-			//TODO: HACK! Empty strings disconnect clients in 1.26.40
-			$entry->objectiveName = $entry->objectiveName === "" ? " " : $entry->objectiveName;
-			if($entry->type === ScorePacketEntry::TYPE_FAKE_PLAYER && $entry->customName === ""){
-				$entry->customName = " ";
-			}
-		}
 		$result->entries = $entries;
 		return $result;
 	}
@@ -77,7 +70,7 @@ class SetScorePacket extends DataPacket implements ClientboundPacket{
 			switch($entry->type){
 				case ScorePacketEntry::TYPE_REMOVE:
 					$entry->scoreboardId = VarInt::readSignedLong($in);
-					$entry->objectiveName = CommonTypes::readOptional($in, CommonTypes::getString(...));
+					$entry->objectiveName = CommonTypes::readDoubleOptional($in, CommonTypes::getString(...)); //BLAMEMOJANG: THIS IS PURE RAGEBAIT. WHAT THE FUCK DOES THIS EVEN MEAN
 					break;
 				case ScorePacketEntry::TYPE_PLAYER:
 				case ScorePacketEntry::TYPE_ENTITY:
@@ -109,7 +102,7 @@ class SetScorePacket extends DataPacket implements ClientboundPacket{
 			switch($entry->type){
 				case ScorePacketEntry::TYPE_REMOVE:
 					VarInt::writeSignedLong($out, $entry->scoreboardId);
-					CommonTypes::writeOptional($out, $entry->objectiveName, CommonTypes::putString(...));
+					CommonTypes::writeDoubleOptional($out, $entry->objectiveName, CommonTypes::putString(...));
 					break;
 				case ScorePacketEntry::TYPE_PLAYER:
 				case ScorePacketEntry::TYPE_ENTITY:
