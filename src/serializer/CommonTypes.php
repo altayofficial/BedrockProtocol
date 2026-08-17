@@ -310,10 +310,7 @@ final class CommonTypes{
 
 	public static function putNetworkItemStackDescriptor(ByteBufferWriter $out, ItemStackWrapper $itemStackWrapper) : void{
 		LE::writeSignedShort($out, $itemStackWrapper->getItemStack()->getId());
-
-		$itemStackCount = $itemStackWrapper->getItemStack()->getCount();
-
-		LE::writeUnsignedShort($out, $itemStackCount);
+		LE::writeUnsignedShort($out, $itemStackWrapper->getItemStack()->getCount());
 
 		$itemStackMeta = $itemStackWrapper->getItemStack()->getMeta();
 		if($itemStackMeta < 0 || $itemStackMeta > 32767) {
