@@ -31,16 +31,10 @@ use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
 final class RedactableString {
 
-	/** @var string */
 	private string $unredacted;
 
-	/** @var string */
 	private string $redacted;
 
-	/**
-	 * @param string $unredacted
-	 * @param string $redacted
-	 */
 	public function __construct(
 		string $unredacted,
 		string $redacted
@@ -49,10 +43,6 @@ final class RedactableString {
 		$this->redacted = $redacted;
 	}
 
-	/**
-	 * @param ByteBufferReader $in
-	 * @return self
-	 */
 	public static function read(ByteBufferReader $in) : self{
 		$unredacted = CommonTypes::getString($in);
 		$redacted = CommonTypes::getString($in);
@@ -63,10 +53,6 @@ final class RedactableString {
 		);
 	}
 
-	/**
-	 * @param ByteBufferWriter $out
-	 * @return void
-	 */
 	public function write(ByteBufferWriter $out) : void{
 		CommonTypes::putString($out, $this->unredacted);
 		CommonTypes::putString($out, $this->redacted);
