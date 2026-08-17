@@ -326,7 +326,7 @@ final class CommonTypes{
 
 		$itemStackBlockRuntimeId = $itemStackWrapper->getItemStack()->getBlockRuntimeId();
 		if($itemStackBlockRuntimeId < 0) {
-			throw new \InvalidArgumentException("Item stack block runtime id should be bigger than 0, " . $itemStackBlockRuntimeId . " given");
+			throw new \InvalidArgumentException("Item stack block runtime ID should be greater than or equal to 0, " . $itemStackBlockRuntimeId . " given");
 		}
 
 		VarInt::writeUnsignedInt($out, $itemStackBlockRuntimeId);
