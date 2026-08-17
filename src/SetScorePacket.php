@@ -70,7 +70,7 @@ class SetScorePacket extends DataPacket implements ClientboundPacket{
 			switch($entry->type){
 				case ScorePacketEntry::TYPE_REMOVE:
 					$entry->scoreboardId = VarInt::readSignedLong($in);
-					$entry->objectiveName = CommonTypes::readDoubleOptional($in, CommonTypes::getString(...)); //BLAMEMOJANG: THIS IS PURE RAGEBAIT. WHAT THE FUCK DOES THIS EVEN MEAN
+					$entry->objectiveName = CommonTypes::readOptional($in, fn(ByteBufferReader $in) => CommonTypes::readOptional($in, CommonTypes::getString(...))); //BLAMEMOJANG: THIS IS PURE RAGEBAIT. WHAT THE FUCK DOES THIS EVEN MEAN
 					break;
 				case ScorePacketEntry::TYPE_PLAYER:
 				case ScorePacketEntry::TYPE_ENTITY:
@@ -102,7 +102,7 @@ class SetScorePacket extends DataPacket implements ClientboundPacket{
 			switch($entry->type){
 				case ScorePacketEntry::TYPE_REMOVE:
 					VarInt::writeSignedLong($out, $entry->scoreboardId);
-					CommonTypes::writeDoubleOptional($out, $entry->objectiveName, CommonTypes::putString(...));
+					CommonTypes::writeOptional($out, $entry->objectiveName, fn(ByteBufferWriter $out, string $objectiveName) => CommonTypes::writeOptional($out, $objectiveName, CommonTypes::putString(...)));
 					break;
 				case ScorePacketEntry::TYPE_PLAYER:
 				case ScorePacketEntry::TYPE_ENTITY:
