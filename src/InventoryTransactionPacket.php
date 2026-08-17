@@ -53,7 +53,7 @@ class InventoryTransactionPacket extends DataPacket implements ClientboundPacket
 	public int $requestId;
 	/** @var InventoryTransactionChangedSlotsHack[] */
 	public array $requestChangedSlots;
-	public ?TransactionData $trData;
+	public TransactionData $trData;
 
 	/**
 	 * @generate-create-func
@@ -78,9 +78,8 @@ class InventoryTransactionPacket extends DataPacket implements ClientboundPacket
 			}
 		}
 
-		$transactionType = CommonTypes::readOptional($in, VarInt::readUnsignedInt(...));
+		$transactionType = VarInt::readUnsignedInt($in);
 		$this->trData = match($transactionType){
-			null => null,
 			NormalTransactionData::ID => new NormalTransactionData(),
 			MismatchTransactionData::ID => new MismatchTransactionData(),
 			UseItemTransactionData::ID => new UseItemTransactionData(),
@@ -89,7 +88,7 @@ class InventoryTransactionPacket extends DataPacket implements ClientboundPacket
 			default => throw new PacketDecodeException("Unknown transaction type $transactionType"),
 		};
 
-		$this->trData?->decode($in);
+		$this->trData->decode($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
@@ -102,9 +101,9 @@ class InventoryTransactionPacket extends DataPacket implements ClientboundPacket
 			}
 		}
 
-		CommonTypes::writeOptional($out, $this->trData?->getTypeId(), VarInt::writeUnsignedInt(...));
+		VarInt::writeUnsignedInt($out, $this->trData->getTypeId());
 
-		$this->trData?->encode($out);
+		$this->trData->encode($out);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

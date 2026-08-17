@@ -81,7 +81,7 @@ final class ItemInteractionData{
 
 	public function write(ByteBufferWriter $out) : void{
 		VarInt::writeSignedInt($out, $this->requestId);
-		CommonTypes::putBool($out, $hasChangedSlots = self::hasChangedSlots($this->requestId));
+		$hasChangedSlots = self::hasChangedSlots($this->requestId);
 		if($hasChangedSlots){
 			VarInt::writeUnsignedInt($out, count($this->requestChangedSlots));
 			foreach($this->requestChangedSlots as $changedSlot){
