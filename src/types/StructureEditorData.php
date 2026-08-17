@@ -40,8 +40,7 @@ class StructureEditorData{
 	public const TYPE_INVALID = 4;
 	public const TYPE_EXPORT = 5;
 
-	public string $structureName;
-	public string $filteredStructureName;
+	public RedactableString $structureName;
 	public string $structureDataField;
 	public bool $includePlayers;
 	public bool $showBoundingBox;
@@ -53,8 +52,7 @@ class StructureEditorData{
 	public static function read(ByteBufferReader $in) : self{
 		$result = new self();
 
-		$result->structureName = CommonTypes::getString($in);
-		$result->filteredStructureName = CommonTypes::getString($in);
+		$result->structureName = RedactableString::read($in);
 		$result->structureDataField = CommonTypes::getString($in);
 
 		$result->includePlayers = CommonTypes::getBool($in);
@@ -68,8 +66,7 @@ class StructureEditorData{
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->structureName);
-		CommonTypes::putString($out, $this->filteredStructureName);
+		$this->structureName->write($out);
 		CommonTypes::putString($out, $this->structureDataField);
 
 		CommonTypes::putBool($out, $this->includePlayers);
