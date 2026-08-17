@@ -51,14 +51,11 @@ abstract class TransactionData{
 	 * @throws PacketDecodeException
 	 */
 	final public function decode(ByteBufferReader $in) : void{
-		$hasValue = CommonTypes::getBool($in);
-		if($hasValue){
-			$actionCount = VarInt::readUnsignedInt($in);
-			for($i = 0; $i < $actionCount; ++$i){
-				$this->actions[] = (new NetworkInventoryAction())->read($in);
-			}
-			$this->decodeData($in);
+		$actionCount = VarInt::readUnsignedInt($in);
+		for($i = 0; $i < $actionCount; ++$i){
+			$this->actions[] = (new NetworkInventoryAction())->read($in);
 		}
+		$this->decodeData($in);
 	}
 
 	/**
@@ -68,14 +65,11 @@ abstract class TransactionData{
 	abstract protected function decodeData(ByteBufferReader $in) : void;
 
 	final public function encode(ByteBufferWriter $out) : void{
-		CommonTypes::putBool($out, $hasValue = count($this->actions) > 0);
-		if($hasValue){
-			VarInt::writeUnsignedInt($out, count($this->actions));
-			foreach($this->actions as $action){
-				$action->write($out);
-			}
-			$this->encodeData($out);
+		VarInt::writeUnsignedInt($out, count($this->actions));
+		foreach($this->actions as $action){
+			$action->write($out);
 		}
+		$this->encodeData($out);
 	}
 
 	abstract protected function encodeData(ByteBufferWriter $out) : void;

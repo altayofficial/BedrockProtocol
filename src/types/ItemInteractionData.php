@@ -68,7 +68,7 @@ final class ItemInteractionData{
 	public static function read(ByteBufferReader $in) : self{
 		$requestId = VarInt::readSignedInt($in);
 		$requestChangedSlots = [];
-		if(CommonTypes::getBool($in) && self::hasChangedSlots($requestId)){
+		if(self::hasChangedSlots($requestId)){
 			$len = VarInt::readUnsignedInt($in);
 			for($i = 0; $i < $len; ++$i){
 				$requestChangedSlots[] = InventoryTransactionChangedSlotsHack::read($in);

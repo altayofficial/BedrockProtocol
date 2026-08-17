@@ -81,7 +81,6 @@ final class ItemStackResponse{
 		$hasContainers = count($this->containerInfos) !== 0;
 		CommonTypes::putBool($out, $hasContainers);
 		if($hasContainers){
-			CommonTypes::putBool($out, true);
 			VarInt::writeUnsignedInt($out, count($this->containerInfos));
 			foreach($this->containerInfos as $containerInfo){
 				$containerInfo->write($out);

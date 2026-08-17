@@ -60,7 +60,7 @@ final class DimensionData{
 		$generator = VarInt::readSignedInt($in);
 		$dimensionType = VarInt::readSignedInt($in);
 		$packId = CommonTypes::getUUID($in);
-		$defaultBiome = CommonTypes::getString($in);
+		$defaultBiome = CommonTypes::getString($in); // max length 256, not sure client disconnects or not so didn't added a check
 
 		return new self($minimumY, $heightRange, $generator, $dimensionType, $packId, $defaultBiome);
 	}
