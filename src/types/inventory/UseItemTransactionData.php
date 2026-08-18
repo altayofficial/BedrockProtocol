@@ -36,6 +36,7 @@ use pocketmine\network\mcpe\protocol\PacketDecodeException;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\types\GetTypeIdFromConstTrait;
+use pocketmine\network\mcpe\protocol\types\HandSlot;
 use function count;
 
 class UseItemTransactionData extends TransactionData{
@@ -53,6 +54,7 @@ class UseItemTransactionData extends TransactionData{
 	private BlockPosition $blockPosition;
 	private int $face;
 	private int $hotbarSlot;
+	private HandSlot $handSlot;
 	private ItemStackWrapper $itemInHand;
 	private Vector3 $playerPosition;
 	private Vector3 $clickPosition;
@@ -134,6 +136,7 @@ class UseItemTransactionData extends TransactionData{
 		$this->blockPosition = CommonTypes::getBlockPosition($in);
 		$this->face = Byte::readUnsigned($in);
 		$this->hotbarSlot = VarInt::readSignedInt($in);
+		$this->handSlot = HandSlot::fromPacket(Byte::readUnsigned($in));
 		$this->itemInHand = CommonTypes::getNetworkItemStackDescriptor($in);
 		$this->playerPosition = CommonTypes::getVector3($in);
 		$this->clickPosition = CommonTypes::getVector3($in);
@@ -148,6 +151,7 @@ class UseItemTransactionData extends TransactionData{
 		CommonTypes::putBlockPosition($out, $this->blockPosition);
 		Byte::writeUnsigned($out, $this->face);
 		VarInt::writeSignedInt($out, $this->hotbarSlot);
+		Byte::writeUnsigned($out, $this->handSlot->value);
 		CommonTypes::putNetworkItemStackDescriptor($out, $this->itemInHand);
 		CommonTypes::putVector3($out, $this->playerPosition);
 		CommonTypes::putVector3($out, $this->clickPosition);
