@@ -47,13 +47,13 @@ final class MolangItemDescriptor implements ItemDescriptor{
 
 	public static function read(ByteBufferReader $in) : self{
 		$expression = CommonTypes::getString($in);
-		$version = LE::readUnsignedShort($in);
+		$version = LE::readSignedShort($in);
 
 		return new self($expression, $version);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
 		CommonTypes::putString($out, $this->molangExpression);
-		LE::writeUnsignedShort($out, $this->molangVersion);
+		LE::writeSignedShort($out, $this->molangVersion);
 	}
 }
