@@ -27,9 +27,7 @@ namespace pocketmine\network\mcpe\protocol;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\VarInt;
-use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
-use function count;
+use pocketmine\network\mcpe\protocol\types\DeathCauseMessageType;
 
 /**
  * Sets the message shown on the death screen underneath "You died!"
@@ -37,42 +35,23 @@ use function count;
 class DeathInfoPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::DEATH_INFO_PACKET;
 
-	private string $messageTranslationKey;
-	/** @var string[] */
-	private array $messageParameters;
+	public DeathCauseMessageType $deathCauseMessageType;
 
 	/**
 	 * @generate-create-func
-	 * @param string[] $messageParameters
 	 */
-	public static function create(string $messageTranslationKey, array $messageParameters) : self{
+	public static function create(DeathCauseMessageType $deathCauseMessageType) : self{
 		$result = new self;
-		$result->messageTranslationKey = $messageTranslationKey;
-		$result->messageParameters = $messageParameters;
+		$result->deathCauseMessageType = $deathCauseMessageType;
 		return $result;
 	}
 
-	public function getMessageTranslationKey() : string{ return $this->messageTranslationKey; }
-
-	/** @return string[] */
-	public function getMessageParameters() : array{ return $this->messageParameters; }
-
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->messageTranslationKey = CommonTypes::getString($in);
-
-		$this->messageParameters = [];
-		for($i = 0, $len = VarInt::readUnsignedInt($in); $i < $len; $i++){
-			$this->messageParameters[] = CommonTypes::getString($in);
-		}
+		DeathCauseMessageType::read($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->messageTranslationKey);
-
-		VarInt::writeUnsignedInt($out, count($this->messageParameters));
-		foreach($this->messageParameters as $parameter){
-			CommonTypes::putString($out, $parameter);
-		}
+		$this->deathCauseMessageType->write($out);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

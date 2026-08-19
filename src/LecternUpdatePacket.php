@@ -34,9 +34,9 @@ use pocketmine\network\mcpe\protocol\types\BlockPosition;
 class LecternUpdatePacket extends DataPacket implements ServerboundPacket{
 	public const NETWORK_ID = ProtocolInfo::LECTERN_UPDATE_PACKET;
 
-	public int $page;
+	public int $page; // the protocol docs shows newPageToShow lol, ain't gonna do that
 	public int $totalPages;
-	public BlockPosition $blockPosition;
+	public BlockPosition $blockPosition; // the protocol docs shows positionOfLecternToUpdate -_-
 
 	/**
 	 * @generate-create-func

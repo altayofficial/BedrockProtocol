@@ -30,39 +30,31 @@ use pmmp\encoding\ByteBufferWriter;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 
-/**
- * Unclear purpose, not used in vanilla Bedrock. Seems to be related to a new Minecraft "editor" edition or mode.
- */
 class EditorNetworkPacket extends DataPacket implements ClientboundPacket, ServerboundPacket{
 	public const NETWORK_ID = ProtocolInfo::EDITOR_NETWORK_PACKET;
 
-	private bool $isRouteToManager;
+	public bool $routeToManager;
 	/** @phpstan-var CacheableNbt<\pocketmine\nbt\tag\CompoundTag> */
-	private CacheableNbt $payload;
+	public CacheableNbt $payload;
 
 	/**
 	 * @generate-create-func
 	 * @phpstan-param CacheableNbt<\pocketmine\nbt\tag\CompoundTag> $payload
 	 */
-	public static function create(bool $isRouteToManager, CacheableNbt $payload) : self{
+	public static function create(bool $routeToManager, CacheableNbt $payload) : self{
 		$result = new self;
-		$result->isRouteToManager = $isRouteToManager;
+		$result->routeToManager = $routeToManager;
 		$result->payload = $payload;
 		return $result;
 	}
 
-	/** @phpstan-return CacheableNbt<\pocketmine\nbt\tag\CompoundTag> */
-	public function getPayload() : CacheableNbt{ return $this->payload; }
-
-	public function isRouteToManager() : bool{ return $this->isRouteToManager; }
-
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->isRouteToManager = CommonTypes::getBool($in);
+		$this->routeToManager = CommonTypes::getBool($in);
 		$this->payload = new CacheableNbt(CommonTypes::getNbtCompoundRoot($in));
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		CommonTypes::putBool($out, $this->isRouteToManager);
+		CommonTypes::putBool($out, $this->routeToManager);
 		$out->writeByteArray($this->payload->getEncodedNbt());
 	}
 

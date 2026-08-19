@@ -31,11 +31,12 @@ use pmmp\encoding\LE;
 use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\BlockPosition;
+use pocketmine\network\mcpe\protocol\types\CommandBlockUpdateTargetType;
 
 class CommandBlockUpdatePacket extends DataPacket implements ServerboundPacket{
 	public const NETWORK_ID = ProtocolInfo::COMMAND_BLOCK_UPDATE_PACKET;
 
-	public bool $isBlock;
+	public CommandBlockUpdateTargetType $targetType;
 
 	public BlockPosition $blockPosition;
 	public int $commandBlockMode;
@@ -48,50 +49,55 @@ class CommandBlockUpdatePacket extends DataPacket implements ServerboundPacket{
 	public string $lastOutput;
 	public string $name;
 	public string $filteredName;
-	public bool $shouldTrackOutput;
+	public bool $trackOutput;
 	public int $tickDelay;
 	public bool $executeOnFirstTick;
 
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->isBlock = CommonTypes::getBool($in);
+		$this->targetType = CommonTypes::getBool($in) ? CommandBlockUpdateTargetType::BLOCK : CommandBlockUpdateTargetType::ENTITY; // BLAMEMOJANG: should be isBlock boolean, protocol docs defined as TargetType
 
-		if($this->isBlock){
-			$this->blockPosition = CommonTypes::getBlockPosition($in);
-			$this->commandBlockMode = VarInt::readUnsignedInt($in);
-			$this->isRedstoneMode = CommonTypes::getBool($in);
-			$this->isConditional = CommonTypes::getBool($in);
-		}else{
-			//Minecart with command block
-			$this->minecartActorRuntimeId = CommonTypes::getActorRuntimeId($in);
+		switch($this->targetType){
+			case CommandBlockUpdateTargetType::BLOCK:
+				$this->blockPosition = CommonTypes::getBlockPosition($in);
+				$this->commandBlockMode = VarInt::readUnsignedInt($in);
+				$this->isRedstoneMode = CommonTypes::getBool($in);
+				$this->isConditional = CommonTypes::getBool($in);
+				break;
+			case CommandBlockUpdateTargetType::ENTITY:
+				$this->minecartActorRuntimeId = CommonTypes::getActorRuntimeId($in);
+				break;
 		}
 
 		$this->command = CommonTypes::getString($in);
 		$this->lastOutput = CommonTypes::getString($in);
 		$this->name = CommonTypes::getString($in);
 		$this->filteredName = CommonTypes::getString($in);
-		$this->shouldTrackOutput = CommonTypes::getBool($in);
-		$this->tickDelay = LE::readUnsignedInt($in);
+		$this->trackOutput = CommonTypes::getBool($in);
+		$this->tickDelay = LE::readSignedInt($in);
 		$this->executeOnFirstTick = CommonTypes::getBool($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		CommonTypes::putBool($out, $this->isBlock);
+		CommonTypes::putBool($out, $this->targetType === CommandBlockUpdateTargetType::BLOCK); // isBlock boolean again
 
-		if($this->isBlock){
-			CommonTypes::putBlockPosition($out, $this->blockPosition);
-			VarInt::writeUnsignedInt($out, $this->commandBlockMode);
-			CommonTypes::putBool($out, $this->isRedstoneMode);
-			CommonTypes::putBool($out, $this->isConditional);
-		}else{
-			CommonTypes::putActorRuntimeId($out, $this->minecartActorRuntimeId);
+		switch($this->targetType){
+			case CommandBlockUpdateTargetType::BLOCK:
+				CommonTypes::putBlockPosition($out, $this->blockPosition);
+				VarInt::writeUnsignedInt($out, $this->commandBlockMode);
+				CommonTypes::putBool($out, $this->isRedstoneMode);
+				CommonTypes::putBool($out, $this->isConditional);
+				break;
+			case CommandBlockUpdateTargetType::ENTITY:
+				CommonTypes::putActorRuntimeId($out, $this->minecartActorRuntimeId);
+				break;
 		}
 
 		CommonTypes::putString($out, $this->command);
 		CommonTypes::putString($out, $this->lastOutput);
 		CommonTypes::putString($out, $this->name);
 		CommonTypes::putString($out, $this->filteredName);
-		CommonTypes::putBool($out, $this->shouldTrackOutput);
-		LE::writeUnsignedInt($out, $this->tickDelay);
+		CommonTypes::putBool($out, $this->trackOutput);
+		LE::writeSignedInt($out, $this->tickDelay);
 		CommonTypes::putBool($out, $this->executeOnFirstTick);
 	}
 

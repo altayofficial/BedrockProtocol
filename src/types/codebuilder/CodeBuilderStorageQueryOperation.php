@@ -23,21 +23,15 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\codebuilder;
 
-final class GameMode{
+use pocketmine\network\mcpe\protocol\types\PacketIntEnumTrait;
 
-	private function __construct(){
-		//NOOP
-	}
+enum CodeBuilderStorageQueryOperation : int {
+	use PacketIntEnumTrait;
 
-	public const SURVIVAL = 0;
-	public const CREATIVE = 1;
-	public const ADVENTURE = 2;
-	/** @deprecated */
-	public const SURVIVAL_VIEWER = 3;
-	/** @deprecated */
-	public const CREATIVE_VIEWER = 4;
-	public const DEFAULT = 5;
-	public const SPECTATOR = 6;
+	case NONE = 0;
+	case GET = 1;
+	case SET = 2;
+	case RESET = 3;
 }

@@ -25,26 +25,9 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types;
 
-use pmmp\encoding\ByteBufferReader;
-use pmmp\encoding\ByteBufferWriter;
-use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
+enum RewindType : int{
+	use PacketIntEnumTrait;
 
-final class FeatureRegistryPacketEntry{
-
-	public function __construct(
-		private string $featureName,
-		private string $binaryJsonOutput
-	){}
-
-	public static function read(ByteBufferReader $in) : self{
-		$featureName = CommonTypes::getString($in);
-		$binaryJsonOutput = CommonTypes::getString($in);
-
-		return new self($featureName, $binaryJsonOutput);
-	}
-
-	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->featureName);
-		CommonTypes::putString($out, $this->binaryJsonOutput);
-	}
+	case PLAYER = 0;
+	case VEHICLE = 1;
 }

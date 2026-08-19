@@ -28,41 +28,36 @@ namespace pocketmine\network\mcpe\protocol;
 use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
+use pocketmine\network\mcpe\protocol\types\codebuilder\CodeBuilderExecutionStatus;
+use pocketmine\network\mcpe\protocol\types\codebuilder\CodeBuilderStorageQueryOptions;
 
 class CodeBuilderSourcePacket extends DataPacket implements ServerboundPacket{
 	public const NETWORK_ID = ProtocolInfo::CODE_BUILDER_SOURCE_PACKET;
 
-	private int $operation;
-	private int $category;
-	private int $codeStatus;
+	public CodeBuilderStorageQueryOptions $storageQueryOptions;
+	public CodeBuilderExecutionStatus $executionStatus;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(int $operation, int $category, int $codeStatus) : self{
+	public static function create(
+		CodeBuilderStorageQueryOptions $storageQueryOptions,
+		CodeBuilderExecutionStatus $executionStatus
+	) : self{
 		$result = new self;
-		$result->operation = $operation;
-		$result->category = $category;
-		$result->codeStatus = $codeStatus;
+		$result->storageQueryOptions = $storageQueryOptions;
+		$result->executionStatus = $executionStatus;
 		return $result;
 	}
 
-	public function getOperation() : int{ return $this->operation; }
-
-	public function getCategory() : int{ return $this->category; }
-
-	public function getCodeStatus() : int{ return $this->codeStatus; }
-
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->operation = Byte::readUnsigned($in);
-		$this->category = Byte::readUnsigned($in);
-		$this->codeStatus = Byte::readUnsigned($in);
+		$this->storageQueryOptions = CodeBuilderStorageQueryOptions::read($in);
+		$this->executionStatus = CodeBuilderExecutionStatus::fromPacket(Byte::readUnsigned($in));
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		Byte::writeUnsigned($out, $this->operation);
-		Byte::writeUnsigned($out, $this->category);
-		Byte::writeUnsigned($out, $this->codeStatus);
+		$this->storageQueryOptions->write($out);
+		Byte::writeUnsigned($out, $this->executionStatus->value);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

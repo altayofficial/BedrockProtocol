@@ -29,22 +29,32 @@ use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
-final class FeatureRegistryPacketEntry{
+final class RedactableString {
+
+	private string $unredacted;
+
+	private string $redacted;
 
 	public function __construct(
-		private string $featureName,
-		private string $binaryJsonOutput
-	){}
+		string $unredacted,
+		string $redacted
+	){
+		$this->unredacted = $unredacted;
+		$this->redacted = $redacted;
+	}
 
 	public static function read(ByteBufferReader $in) : self{
-		$featureName = CommonTypes::getString($in);
-		$binaryJsonOutput = CommonTypes::getString($in);
+		$unredacted = CommonTypes::getString($in);
+		$redacted = CommonTypes::getString($in);
 
-		return new self($featureName, $binaryJsonOutput);
+		return new self(
+			$unredacted,
+			$redacted
+		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->featureName);
-		CommonTypes::putString($out, $this->binaryJsonOutput);
+		CommonTypes::putString($out, $this->unredacted);
+		CommonTypes::putString($out, $this->redacted);
 	}
 }

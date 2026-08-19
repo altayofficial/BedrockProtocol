@@ -311,6 +311,12 @@ final class CommonTypes{
 	public static function putNetworkItemStackDescriptor(ByteBufferWriter $out, ItemStackWrapper $itemStackWrapper) : void{
 		LE::writeSignedShort($out, $itemStackWrapper->getItemStack()->getId());
 		LE::writeUnsignedShort($out, $itemStackWrapper->getItemStack()->getCount());
+
+		$itemStackMeta = $itemStackWrapper->getItemStack()->getMeta();
+		if($itemStackMeta < 0 || $itemStackMeta > 32767) {
+			throw new \InvalidArgumentException("Item stack meta range should be in 0-32767, " . $itemStackMeta . " given");
+		}
+
 		VarInt::writeUnsignedInt($out, $itemStackWrapper->getItemStack()->getMeta());
 
 		self::putBool($out, $hasNetId = $itemStackWrapper->getStackId() !== 0);
@@ -318,7 +324,12 @@ final class CommonTypes{
 			VarInt::writeSignedInt($out, $itemStackWrapper->getStackId());
 		}
 
-		VarInt::writeUnsignedInt($out, $itemStackWrapper->getItemStack()->getBlockRuntimeId());
+		$itemStackBlockRuntimeId = $itemStackWrapper->getItemStack()->getBlockRuntimeId();
+		if($itemStackBlockRuntimeId < 0) {
+			throw new \InvalidArgumentException("Item stack block runtime ID should be greater than or equal to 0, " . $itemStackBlockRuntimeId . " given");
+		}
+
+		VarInt::writeUnsignedInt($out, $itemStackBlockRuntimeId);
 		self::putString($out, $itemStackWrapper->getItemStack()->getRawExtraData());
 	}
 
@@ -756,42 +767,5 @@ final class CommonTypes{
 		}else{
 			self::putBool($out, false);
 		}
-	}
-
-	/**
-	 * Credits to @alvin0319
-	 */
-	public static function readDummyOptional(ByteBufferReader $in) : void{
-		$dummy = Byte::readUnsigned($in);
-		if($dummy !== 1){
-			throw new PacketDecodeException("Dummy optional first byte should always be 1, got $dummy");
-		}
-	}
-
-	public static function writeDummyOptional(ByteBufferWriter $out) : void{
-		Byte::writeUnsigned($out, 1);
-	}
-
-	/**
-	 * Credits to @alvin0319
-	 * @phpstan-template T
-	 * @phpstan-param \Closure(ByteBufferReader) : T $reader
-	 * @phpstan-return T|null
-	 * @throws DataDecodeException
-	 */
-	public static function readDoubleOptional(ByteBufferReader $in, \Closure $reader) : mixed{
-		self::readDummyOptional($in);
-		return self::readOptional($in, $reader);
-	}
-
-	/**
-	 * Credits to @alvin0319
-	 * @phpstan-template T
-	 * @phpstan-param T|null $value
-	 * @phpstan-param \Closure(ByteBufferWriter, T) : void $writer
-	 */
-	public static function writeDoubleOptional(ByteBufferWriter $out, mixed $value, \Closure $writer) : void{
-		self::writeDummyOptional($out);
-		self::writeOptional($out, $value, $writer);
 	}
 }
