@@ -23,12 +23,13 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
 /**
- * @see AttributeLayerSettingsWeight
+ * @see AttributeEnvironmentPayload
  */
-final class AttributeLayerSettingsWeightType{
-	public const FLOAT = 0;
-	public const STRING = 1;
+final class AttributeEnvironmentPayloadType{
+	public const CONSTANT = 0;
+	public const TRANSITION = 1;
+	public const NOISE_TRANSITION = 2;
 }

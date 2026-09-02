@@ -23,44 +23,52 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\LE;
-use pocketmine\color\Color;
+use pmmp\encoding\VarInt;
+use function count;
 
 /**
- * @see AttributeValueColor
+ * @see ClientboundAttributeLayerSyncPacket
  */
-final class AttributeValueColorArray extends AttributeValueColorValue{
-	public const ID = AttributeValueColorType::ARRAY;
+final class AttributeUpdateLayers extends AttributeLayerSyncPayload{
+	public const ID = AttributeLayerSyncType::UPDATE_LAYERS;
 
+	/**
+	 * @param AttributeLayer[] $layers
+	 * @phpstan-param list<AttributeLayer> $layers
+	 */
 	public function __construct(
-		private Color $value
+		private array $layers,
 	){}
 
 	public function getTypeId() : int{
 		return self::ID;
 	}
 
-	public function getValue() : Color{ return $this->value; }
+	/**
+	 * @return AttributeLayer[]
+	 * @phpstan-return list<AttributeLayer>
+	 */
+	public function getLayers() : array{ return $this->layers; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$r = LE::readUnsignedInt($in);
-		$g = LE::readUnsignedInt($in);
-		$b = LE::readUnsignedInt($in);
-		$a = LE::readUnsignedInt($in);
+		$layers = [];
+		for($i = 0, $len = VarInt::readUnsignedInt($in); $i < $len; ++$i){
+			$layers[] = AttributeLayer::read($in);
+		}
 
 		return new self(
-			new Color($r, $g, $b, $a)
+			$layers,
 		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		LE::writeUnsignedInt($out, $this->value->getR());
-		LE::writeUnsignedInt($out, $this->value->getG());
-		LE::writeUnsignedInt($out, $this->value->getB());
-		LE::writeUnsignedInt($out, $this->value->getA());
+		VarInt::writeUnsignedInt($out, count($this->layers));
+		foreach($this->layers as $layer){
+			$layer->write($out);
+		}
 	}
 }

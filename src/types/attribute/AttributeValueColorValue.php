@@ -23,9 +23,16 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
-enum NoiseAlignmentType : int{
-	use PacketIntEnumTrait;
-	case MIN_LOCAL_TRANSITION_END = 0;
+use pmmp\encoding\ByteBufferWriter;
+
+/**
+ * @see AttributeValueColor
+ */
+abstract class AttributeValueColorValue{
+
+	abstract public function getTypeId() : int;
+
+	abstract public function write(ByteBufferWriter $out) : void;
 }

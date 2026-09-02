@@ -23,13 +23,16 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
+
+use pmmp\encoding\ByteBufferWriter;
 
 /**
- * @see ClientboundMatchmakingStatePacket
+ * @see AttributeLayerSettings
  */
-final class MatchmakingState{
-	public const IDLE = "Idle";
-	public const MATCHMAKING = "Matchmaking";
-	public const MATCH_FOUND = "MatchFound";
+abstract class AttributeLayerSettingsWeight{
+
+	abstract public function getTypeId() : int;
+
+	abstract public function write(ByteBufferWriter $out) : void;
 }

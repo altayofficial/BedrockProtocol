@@ -28,6 +28,7 @@ namespace pocketmine\network\mcpe\protocol;
 use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\VarInt;
 
 class ServerboundStonecutterSetRecipePacket extends DataPacket implements ServerboundPacket{
 	public const NETWORK_ID = ProtocolInfo::SERVERBOUND_STONECUTTER_SET_RECIPE_PACKET;
@@ -51,12 +52,12 @@ class ServerboundStonecutterSetRecipePacket extends DataPacket implements Server
 
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$this->containerId = Byte::readUnsigned($in);
-		$this->recipeIndex = Byte::readSigned($in);
+		$this->recipeIndex = VarInt::readSignedInt($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
 		Byte::writeUnsigned($out, $this->containerId);
-		Byte::writeSigned($out, $this->recipeIndex);
+		VarInt::writeSignedInt($out, $this->recipeIndex);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

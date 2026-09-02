@@ -23,12 +23,14 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
 /**
- * @see AttributeValueColor
+ * @see AttributeLayerSyncPayload
  */
-final class AttributeValueColorType{
-	public const STRING = 0;
-	public const ARRAY = 1;
+final class AttributeLayerSyncType{
+	public const UPDATE_LAYERS = 0;
+	public const UPDATE_LAYER_SETTINGS = 1;
+	public const UPDATE_ENVIRONMENT = 2;
+	public const REMOVE_ENVIRONMENT = 3;
 }

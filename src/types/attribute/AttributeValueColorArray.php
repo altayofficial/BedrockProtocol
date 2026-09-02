@@ -23,37 +23,44 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
+use pmmp\encoding\LE;
+use pocketmine\color\Color;
 
 /**
  * @see AttributeValueColor
  */
-final class AttributeValueColorString extends AttributeValueColorValue{
-	public const ID = AttributeValueColorType::STRING;
+final class AttributeValueColorArray extends AttributeValueColorValue{
+	public const ID = AttributeValueColorType::ARRAY;
 
 	public function __construct(
-		private string $value
+		private Color $value
 	){}
 
 	public function getTypeId() : int{
 		return self::ID;
 	}
 
-	public function getValue() : string{ return $this->value; }
+	public function getValue() : Color{ return $this->value; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$value = CommonTypes::getString($in);
+		$r = LE::readUnsignedInt($in);
+		$g = LE::readUnsignedInt($in);
+		$b = LE::readUnsignedInt($in);
+		$a = LE::readUnsignedInt($in);
 
 		return new self(
-			$value
+			new Color($r, $g, $b, $a)
 		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->value);
+		LE::writeUnsignedInt($out, $this->value->getR());
+		LE::writeUnsignedInt($out, $this->value->getG());
+		LE::writeUnsignedInt($out, $this->value->getB());
+		LE::writeUnsignedInt($out, $this->value->getA());
 	}
 }

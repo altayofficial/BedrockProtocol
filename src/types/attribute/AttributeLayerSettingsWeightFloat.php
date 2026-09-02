@@ -23,38 +23,37 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
-use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\VarInt;
+use pmmp\encoding\LE;
 
-final class NoiseAlignment{
+/**
+ * @see AttributeLayerSettings
+ */
+final class AttributeLayerSettingsWeightFloat extends AttributeLayerSettingsWeight{
+	public const ID = AttributeLayerSettingsWeightType::FLOAT;
+
 	public function __construct(
-		private NoiseAlignmentType $type,
-		private int $value
+		private float $value
 	){}
 
-	public function getType() : NoiseAlignmentType{
-		return $this->type;
+	public function getTypeId() : int{
+		return self::ID;
 	}
 
-	public function getValue() : int{
-		return $this->value;
-	}
+	public function getValue() : float{ return $this->value; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$type = NoiseAlignmentType::fromPacket(Byte::readUnsigned($in));
-		$value = VarInt::readUnsignedInt($in);
+		$value = LE::readFloat($in);
+
 		return new self(
-			$type,
 			$value
 		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		Byte::writeUnsigned($out, $this->type->value);
-		VarInt::writeUnsignedInt($out, $this->value);
+		LE::writeFloat($out, $this->value);
 	}
 }

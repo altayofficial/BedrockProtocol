@@ -23,13 +23,12 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
 /**
- * @see AttributeValue
+ * @see AttributeLayerSettingsWeight
  */
-final class AttributeValueType{
-	public const BOOL = 0;
-	public const FLOAT = 1;
-	public const COLOR = 2;
+final class AttributeLayerSettingsWeightType{
+	public const FLOAT = 0;
+	public const STRING = 1;
 }

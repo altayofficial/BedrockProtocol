@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types;
 
-use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
@@ -68,7 +67,7 @@ final class DimensionData{
 		$dimensionType = VarInt::readSignedInt($in);
 		$packId = CommonTypes::getUUID($in);
 		$defaultBiome = CommonTypes::getString($in); // max length 256, not sure client disconnects or not so didn't add a check
-		$cloudHeight = Byte::readSigned($in);
+		$cloudHeight = VarInt::readSignedInt($in);
 		$renderClouds = CommonTypes::getBool($in);
 
 		return new self($minimumY, $heightRange, $generator, $dimensionType, $packId, $defaultBiome, $cloudHeight, $renderClouds);
@@ -81,7 +80,7 @@ final class DimensionData{
 		VarInt::writeSignedInt($out, $this->dimensionType);
 		CommonTypes::putUUID($out, $this->packId);
 		CommonTypes::putString($out, $this->defaultBiome);
-		Byte::writeSigned($out, $this->cloudHeight);
+		VarInt::writeSignedInt($out, $this->cloudHeight);
 		CommonTypes::putBool($out, $this->renderClouds);
 	}
 }

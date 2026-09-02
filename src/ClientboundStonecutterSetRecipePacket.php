@@ -28,6 +28,7 @@ namespace pocketmine\network\mcpe\protocol;
 use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
 class ClientboundStonecutterSetRecipePacket extends DataPacket implements ClientboundPacket{
@@ -57,13 +58,13 @@ class ClientboundStonecutterSetRecipePacket extends DataPacket implements Client
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$this->actorUniqueId = CommonTypes::getActorUniqueId($in);
 		$this->containerId = Byte::readUnsigned($in);
-		$this->recipeIndex = Byte::readSigned($in);
+		$this->recipeIndex = VarInt::readSignedInt($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		CommonTypes::putActorRuntimeId($out, $this->actorUniqueId);
+		CommonTypes::putActorUniqueId($out, $this->actorUniqueId);
 		Byte::writeUnsigned($out, $this->containerId);
-		Byte::writeSigned($out, $this->recipeIndex);
+		VarInt::writeSignedInt($out, $this->recipeIndex);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

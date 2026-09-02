@@ -23,28 +23,29 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\VarInt;
-use pocketmine\network\mcpe\protocol\PacketDecodeException;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
 /**
  * @see AttributeEnvironment
  */
-final class AttributeValueColor extends AttributeValue{
-	public const ID = AttributeValueType::COLOR;
+final class AttributeValueBool extends AttributeValue{
+	public const ID = AttributeValueType::BOOL;
 
 	public const OPERATION_OVERRIDE = "override";
 	public const OPERATION_ALPHA_BLEND = "alpha_blend";
-	public const OPERATION_ADD = "add";
-	public const OPERATION_SUBTRACT = "subtract";
-	public const OPERATION_MULTIPLY = "multiply";
+	public const OPERATION_AND = "and";
+	public const OPERATION_NAND = "nand";
+	public const OPERATION_OR = "or";
+	public const OPERATION_NOR = "nor";
+	public const OPERATION_XOR = "xor";
+	public const OPERATION_XNOR = "xnor";
 
 	public function __construct(
-		private AttributeValueColorValue $value,
+		private bool $value,
 		private string $operation,
 	){}
 
@@ -52,16 +53,12 @@ final class AttributeValueColor extends AttributeValue{
 		return self::ID;
 	}
 
-	public function getValue() : AttributeValueColorValue{ return $this->value; }
+	public function getValue() : bool{ return $this->value; }
 
 	public function getOperation() : string{ return $this->operation; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$value = match(VarInt::readUnsignedInt($in)){
-			AttributeValueColorArray::ID => AttributeValueColorArray::read($in),
-			AttributeValueColorString::ID => AttributeValueColorString::read($in),
-			default => throw new PacketDecodeException("Unknown AttributeValueColor type"),
-		};
+		$value = CommonTypes::getBool($in);
 		$operation = CommonTypes::getString($in);
 
 		return new self(
@@ -71,8 +68,7 @@ final class AttributeValueColor extends AttributeValue{
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		VarInt::writeUnsignedInt($out, $this->value->getTypeId());
-		$this->value->write($out);
+		CommonTypes::putBool($out, $this->value);
 		CommonTypes::putString($out, $this->operation);
 	}
 }

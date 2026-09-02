@@ -23,52 +23,67 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use function count;
 
 /**
  * @see ClientboundAttributeLayerSyncPacket
  */
-final class AttributeUpdateLayers extends AttributeLayerSyncPayload{
-	public const ID = AttributeLayerSyncType::UPDATE_LAYERS;
+final class AttributesRemoveEnvironment extends AttributeLayerSyncPayload{
+	public const ID = AttributeLayerSyncType::REMOVE_ENVIRONMENT;
 
 	/**
-	 * @param AttributeLayer[] $layers
-	 * @phpstan-param list<AttributeLayer> $layers
+	 * @param string[] $attributes
+	 * @phpstan-param list<string> $attributes
 	 */
 	public function __construct(
-		private array $layers,
+		private string $name,
+		private int $dimension,
+		private array $attributes,
 	){}
 
 	public function getTypeId() : int{
 		return self::ID;
 	}
 
+	public function getName() : string{ return $this->name; }
+
+	public function getDimension() : int{ return $this->dimension; }
+
 	/**
-	 * @return AttributeLayer[]
-	 * @phpstan-return list<AttributeLayer>
+	 * @return string[]
+	 * @phpstan-return list<string>
 	 */
-	public function getLayers() : array{ return $this->layers; }
+	public function getAttributes() : array{ return $this->attributes; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$layers = [];
+		$name = CommonTypes::getString($in);
+		$dimension = VarInt::readUnsignedInt($in);
+
+		$attributes = [];
 		for($i = 0, $len = VarInt::readUnsignedInt($in); $i < $len; ++$i){
-			$layers[] = AttributeLayer::read($in);
+			$attributes[] = CommonTypes::getString($in);
 		}
 
 		return new self(
-			$layers,
+			$name,
+			$dimension,
+			$attributes,
 		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		VarInt::writeUnsignedInt($out, count($this->layers));
-		foreach($this->layers as $layer){
-			$layer->write($out);
+		CommonTypes::putString($out, $this->name);
+		VarInt::writeUnsignedInt($out, $this->dimension);
+
+		VarInt::writeUnsignedInt($out, count($this->attributes));
+		foreach($this->attributes as $attribute){
+			CommonTypes::putString($out, $attribute);
 		}
 	}
 }

@@ -23,14 +23,12 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
-/**
- * @see AttributeLayerSyncPayload
- */
-final class AttributeLayerSyncType{
-	public const UPDATE_LAYERS = 0;
-	public const UPDATE_LAYER_SETTINGS = 1;
-	public const UPDATE_ENVIRONMENT = 2;
-	public const REMOVE_ENVIRONMENT = 3;
+use pocketmine\network\mcpe\protocol\types\PacketIntEnumTrait;
+
+enum NoiseAlignmentType : int{
+	use PacketIntEnumTrait;
+
+	case MIN_LOCAL_TRANSITION_END = 0;
 }

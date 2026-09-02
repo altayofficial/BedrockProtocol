@@ -23,37 +23,40 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
 /**
- * @see AttributeLayerSettings
+ * @see AttributeLayer&AttributesUpdateEnvironment
  */
-final class AttributeLayerSettingsWeightString extends AttributeLayerSettingsWeight{
-	public const ID = AttributeLayerSettingsWeightType::STRING;
+final class AttributeEnvironment{
 
 	public function __construct(
-		private string $value
+		private string $name,
+		private AttributeEnvironmentPayload $payload,
 	){}
 
-	public function getTypeId() : int{
-		return self::ID;
-	}
+	public function getName() : string{ return $this->name; }
 
-	public function getValue() : string{ return $this->value; }
+	public function getPayload() : AttributeEnvironmentPayload{ return $this->payload; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$value = CommonTypes::getString($in);
+		$name = CommonTypes::getString($in);
+		$payload = AttributeEnvironmentPayload::read($in);
 
 		return new self(
-			$value
+			$name,
+			$payload
 		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->value);
+		CommonTypes::putString($out, $this->name);
+		VarInt::writeUnsignedInt($out, $this->payload->getTypeId());
+		$this->payload->write($out);
 	}
 }

@@ -23,13 +23,12 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
 /**
- * @see ClientboundMatchmakingStatePacket
+ * @see AttributeValueColor
  */
-final class MatchmakingState{
-	public const IDLE = "Idle";
-	public const MATCHMAKING = "Matchmaking";
-	public const MATCH_FOUND = "MatchFound";
+final class AttributeValueColorType{
+	public const STRING = 0;
+	public const ARRAY = 1;
 }

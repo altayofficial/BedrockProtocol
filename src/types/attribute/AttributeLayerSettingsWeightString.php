@@ -23,28 +23,37 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\VarInt;
-use pocketmine\network\mcpe\protocol\PacketDecodeException;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
 /**
- * @see AttributeEnvironment
+ * @see AttributeLayerSettings
  */
-abstract class AttributeValue{
+final class AttributeLayerSettingsWeightString extends AttributeLayerSettingsWeight{
+	public const ID = AttributeLayerSettingsWeightType::STRING;
 
-	abstract public function getTypeId() : int;
+	public function __construct(
+		private string $value
+	){}
 
-	abstract public function write(ByteBufferWriter $out) : void;
+	public function getTypeId() : int{
+		return self::ID;
+	}
+
+	public function getValue() : string{ return $this->value; }
 
 	public static function read(ByteBufferReader $in) : self{
-		return match(VarInt::readUnsignedInt($in)){
-			AttributeValueBool::ID => AttributeValueBool::read($in),
-			AttributeValueFloat::ID => AttributeValueFloat::read($in),
-			AttributeValueColor::ID => AttributeValueColor::read($in),
-			default => throw new PacketDecodeException("Unknown AttributeValue type"),
-		};
+		$value = CommonTypes::getString($in);
+
+		return new self(
+			$value
+		);
+	}
+
+	public function write(ByteBufferWriter $out) : void{
+		CommonTypes::putString($out, $this->value);
 	}
 }

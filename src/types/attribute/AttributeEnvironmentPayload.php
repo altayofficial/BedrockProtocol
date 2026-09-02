@@ -23,16 +23,28 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
+use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\VarInt;
+use pocketmine\network\mcpe\protocol\PacketDecodeException;
 
 /**
- * @see AttributeValueColor
+ * @see AttributeEnvironment
  */
-abstract class AttributeValueColorValue{
+abstract class AttributeEnvironmentPayload{
 
 	abstract public function getTypeId() : int;
 
 	abstract public function write(ByteBufferWriter $out) : void;
+
+	public static function read(ByteBufferReader $in) : self{
+		return match(VarInt::readUnsignedInt($in)){
+			AttributeEnvironmentPayloadConstant::ID => AttributeEnvironmentPayloadConstant::read($in),
+			AttributeEnvironmentPayloadTransition::ID => AttributeEnvironmentPayloadTransition::read($in),
+			AttributeEnvironmentPayloadNoiseTransition::ID => AttributeEnvironmentPayloadNoiseTransition::read($in),
+			default => throw new PacketDecodeException("Unknown AttributeEnvironmentPayload type"),
+		};
+	}
 }

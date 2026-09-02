@@ -23,16 +23,13 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
-
-use pmmp\encoding\ByteBufferWriter;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
 /**
- * @see AttributeLayerSettings
+ * @see AttributeValue
  */
-abstract class AttributeLayerSettingsWeight{
-
-	abstract public function getTypeId() : int;
-
-	abstract public function write(ByteBufferWriter $out) : void;
+final class AttributeValueType{
+	public const BOOL = 0;
+	public const FLOAT = 1;
+	public const COLOR = 2;
 }

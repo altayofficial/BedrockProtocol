@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
@@ -34,12 +34,12 @@ use function count;
 /**
  * @see ClientboundAttributeLayerSyncPacket
  */
-final class AttributesRemoveEnvironment extends AttributeLayerSyncPayload{
-	public const ID = AttributeLayerSyncType::REMOVE_ENVIRONMENT;
+final class AttributesUpdateEnvironment extends AttributeLayerSyncPayload{
+	public const ID = AttributeLayerSyncType::UPDATE_ENVIRONMENT;
 
 	/**
-	 * @param string[] $attributes
-	 * @phpstan-param list<string> $attributes
+	 * @param AttributeEnvironment[] $attributes
+	 * @phpstan-param list<AttributeEnvironment> $attributes
 	 */
 	public function __construct(
 		private string $name,
@@ -56,8 +56,8 @@ final class AttributesRemoveEnvironment extends AttributeLayerSyncPayload{
 	public function getDimension() : int{ return $this->dimension; }
 
 	/**
-	 * @return string[]
-	 * @phpstan-return list<string>
+	 * @return AttributeEnvironment[]
+	 * @phpstan-return list<AttributeEnvironment>
 	 */
 	public function getAttributes() : array{ return $this->attributes; }
 
@@ -67,7 +67,7 @@ final class AttributesRemoveEnvironment extends AttributeLayerSyncPayload{
 
 		$attributes = [];
 		for($i = 0, $len = VarInt::readUnsignedInt($in); $i < $len; ++$i){
-			$attributes[] = CommonTypes::getString($in);
+			$attributes[] = AttributeEnvironment::read($in);
 		}
 
 		return new self(
@@ -83,7 +83,7 @@ final class AttributesRemoveEnvironment extends AttributeLayerSyncPayload{
 
 		VarInt::writeUnsignedInt($out, count($this->attributes));
 		foreach($this->attributes as $attribute){
-			CommonTypes::putString($out, $attribute);
+			$attribute->write($out);
 		}
 	}
 }

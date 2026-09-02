@@ -23,52 +23,50 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
 /**
- * @see AttributeEnvironment
+ * @see ClientboundAttributeLayerSyncPacket
  */
-final class AttributeValueBool extends AttributeValue{
-	public const ID = AttributeValueType::BOOL;
-
-	public const OPERATION_OVERRIDE = "override";
-	public const OPERATION_ALPHA_BLEND = "alpha_blend";
-	public const OPERATION_AND = "and";
-	public const OPERATION_NAND = "nand";
-	public const OPERATION_OR = "or";
-	public const OPERATION_NOR = "nor";
-	public const OPERATION_XOR = "xor";
-	public const OPERATION_XNOR = "xnor";
+final class AttributeUpdateLayerSettings extends AttributeLayerSyncPayload{
+	public const ID = AttributeLayerSyncType::UPDATE_LAYER_SETTINGS;
 
 	public function __construct(
-		private bool $value,
-		private string $operation,
+		private string $name,
+		private int $dimension,
+		private AttributeLayerSettings $settings,
 	){}
 
 	public function getTypeId() : int{
 		return self::ID;
 	}
 
-	public function getValue() : bool{ return $this->value; }
+	public function getName() : string{ return $this->name; }
 
-	public function getOperation() : string{ return $this->operation; }
+	public function getDimension() : int{ return $this->dimension; }
+
+	public function getSettings() : AttributeLayerSettings{ return $this->settings; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$value = CommonTypes::getBool($in);
-		$operation = CommonTypes::getString($in);
+		$name = CommonTypes::getString($in);
+		$dimension = VarInt::readUnsignedInt($in);
+		$settings = AttributeLayerSettings::read($in);
 
 		return new self(
-			$value,
-			$operation
+			$name,
+			$dimension,
+			$settings
 		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putBool($out, $this->value);
-		CommonTypes::putString($out, $this->operation);
+		CommonTypes::putString($out, $this->name);
+		VarInt::writeUnsignedInt($out, $this->dimension);
+		$this->settings->write($out);
 	}
 }

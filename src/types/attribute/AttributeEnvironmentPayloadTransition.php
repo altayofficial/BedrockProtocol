@@ -23,50 +23,51 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types;
+namespace pocketmine\network\mcpe\protocol\types\attribute;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
-use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
 /**
- * @see ClientboundAttributeLayerSyncPacket
+ * @see AttributeEnvironment
  */
-final class AttributeUpdateLayerSettings extends AttributeLayerSyncPayload{
-	public const ID = AttributeLayerSyncType::UPDATE_LAYER_SETTINGS;
+final class AttributeEnvironmentPayloadTransition extends AttributeEnvironmentPayload{
+	public const ID = AttributeEnvironmentPayloadType::TRANSITION;
 
 	public function __construct(
-		private string $name,
-		private int $dimension,
-		private AttributeLayerSettings $settings,
+		private AttributeValue $fromAttribute,
+		private AttributeValue $toAttribute,
+		private AttributeTransitionSettings $settings,
 	){}
 
 	public function getTypeId() : int{
 		return self::ID;
 	}
 
-	public function getName() : string{ return $this->name; }
+	public function getFromAttribute() : AttributeValue{ return $this->fromAttribute; }
 
-	public function getDimension() : int{ return $this->dimension; }
+	public function getToAttribute() : AttributeValue{ return $this->toAttribute; }
 
-	public function getSettings() : AttributeLayerSettings{ return $this->settings; }
+	public function getSettings() : AttributeTransitionSettings{ return $this->settings; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$name = CommonTypes::getString($in);
-		$dimension = VarInt::readUnsignedInt($in);
-		$settings = AttributeLayerSettings::read($in);
+		$fromAttribute = AttributeValue::read($in);
+		$toAttribute = AttributeValue::read($in);
+		$settings = AttributeTransitionSettings::read($in);
 
 		return new self(
-			$name,
-			$dimension,
+			$fromAttribute,
+			$toAttribute,
 			$settings
 		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->name);
-		VarInt::writeUnsignedInt($out, $this->dimension);
+		VarInt::writeUnsignedInt($out, $this->fromAttribute->getTypeId());
+		$this->fromAttribute->write($out);
+		VarInt::writeUnsignedInt($out, $this->toAttribute->getTypeId());
+		$this->toAttribute->write($out);
 		$this->settings->write($out);
 	}
 }
