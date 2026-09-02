@@ -956,4 +956,20 @@ trait PacketHandlerDefaultImplTrait{
 	public function handleRecordStarted(RecordStartedPacket $packet) : bool{
 		return false;
 	}
+
+	public function handleClientboundMatchmakingState(ClientboundMatchmakingStatePacket $packet) : bool{
+		return false;
+	}
+
+	public function handleClientboundStonecutterSetRecipe(ClientboundStonecutterSetRecipePacket $packet) : bool{
+		return false;
+	}
+
+	public function handleServerboundStonecutterSetRecipe(ServerboundStonecutterSetRecipePacket $packet) : bool{
+		return false;
+	}
+
+	public function handleServerboundMatchmakingCancel(ServerboundMatchmakingCancelPacket $packet) : bool{
+		return false;
+	}
 }

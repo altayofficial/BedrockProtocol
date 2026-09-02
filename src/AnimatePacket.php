@@ -30,6 +30,7 @@ use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
+use pocketmine\network\mcpe\protocol\types\HandSlot;
 
 class AnimatePacket extends DataPacket implements ClientboundPacket, ServerboundPacket{
 	public const NETWORK_ID = ProtocolInfo::ANIMATE_PACKET;
@@ -44,13 +45,15 @@ class AnimatePacket extends DataPacket implements ClientboundPacket, Serverbound
 	public int $actorRuntimeId;
 	public float $data = 0.0;
 	public ?string $swingSource = null;
+	public ?HandSlot $handSlot = null;
 
-	public static function create(int $actorRuntimeId, int $action, float $data = 0.0, ?string $swingSource = null) : self{
+	public static function create(int $actorRuntimeId, int $action, float $data = 0.0, ?string $swingSource = null, ?HandSlot $handSlot = null) : self{
 		$result = new self;
 		$result->actorRuntimeId = $actorRuntimeId;
 		$result->action = $action;
 		$result->data = $data;
 		$result->swingSource = $swingSource;
+		$result->handSlot = $handSlot;
 		return $result;
 	}
 
@@ -59,6 +62,7 @@ class AnimatePacket extends DataPacket implements ClientboundPacket, Serverbound
 		$this->actorRuntimeId = CommonTypes::getActorRuntimeId($in);
 		$this->data = LE::readFloat($in);
 		$this->swingSource = CommonTypes::readOptional($in, CommonTypes::getString(...));
+		$this->handSlot = CommonTypes::readOptional($in, fn() => HandSlot::fromPacket(Byte::readUnsigned($in)));
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
@@ -66,6 +70,7 @@ class AnimatePacket extends DataPacket implements ClientboundPacket, Serverbound
 		CommonTypes::putActorRuntimeId($out, $this->actorRuntimeId);
 		LE::writeFloat($out, $this->data);
 		CommonTypes::writeOptional($out, $this->swingSource, CommonTypes::putString(...));
+		CommonTypes::writeOptional($out, $this->handSlot, fn(ByteBufferWriter $out, HandSlot $handSlot) => Byte::writeUnsigned($out, $handSlot->value));
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{
