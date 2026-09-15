@@ -28,18 +28,24 @@ namespace pocketmine\network\mcpe\protocol\types;
 use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\VarInt;
+use pocketmine\network\mcpe\protocol\PacketDecodeException;
 use function array_fill;
 use function count;
 
 class SubChunkPacketHeightMapInfo{
+
+	private const ENTRY_COUNT = 272;
+	/** Heights are sent in runs of this many values, each prefixed by its length. */
+	private const RUN_LENGTH = 16;
 
 	/**
 	 * @param int[] $heights ZZZZXXXX key bit order
 	 * @phpstan-param list<int> $heights
 	 */
 	public function __construct(private array $heights){
-		if(count($heights) !== 256){
-			throw new \InvalidArgumentException("Expected exactly 256 heightmap values");
+		if(count($heights) !== self::ENTRY_COUNT){
+			throw new \InvalidArgumentException("Expected exactly " . self::ENTRY_COUNT . " heightmap values");
 		}
 	}
 
@@ -52,24 +58,33 @@ class SubChunkPacketHeightMapInfo{
 
 	public static function read(ByteBufferReader $in) : self{
 		$heights = [];
-		for($i = 0; $i < 256; ++$i){
-			$heights[] = Byte::readSigned($in);
+		for($i = 0; $i < self::ENTRY_COUNT; $i += self::RUN_LENGTH){
+			$runLength = VarInt::readUnsignedInt($in);
+			if($runLength !== self::RUN_LENGTH){
+				throw new PacketDecodeException("Expected heightmap run length of " . self::RUN_LENGTH . ", got $runLength");
+			}
+			for($j = 0; $j < self::RUN_LENGTH; ++$j){
+				$heights[] = Byte::readSigned($in);
+			}
 		}
 		return new self($heights);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		for($i = 0; $i < 256; ++$i){
-			Byte::writeSigned($out, $this->heights[$i]);
+		for($i = 0; $i < self::ENTRY_COUNT; $i += self::RUN_LENGTH){
+			VarInt::writeUnsignedInt($out, self::RUN_LENGTH);
+			for($j = 0; $j < self::RUN_LENGTH; ++$j){
+				Byte::writeSigned($out, $this->heights[$i + $j]);
+			}
 		}
 	}
 
 	public static function allTooLow() : self{
-		return new self(array_fill(0, 256, -1));
+		return new self(array_fill(0, self::ENTRY_COUNT, -1));
 	}
 
 	public static function allTooHigh() : self{
-		return new self(array_fill(0, 256, 16));
+		return new self(array_fill(0, self::ENTRY_COUNT, 16));
 	}
 
 	public function isAllTooLow() : bool{

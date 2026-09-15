@@ -28,15 +28,13 @@ namespace pocketmine\network\mcpe\protocol\types\inventory;
 use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\DataDecodeException;
 use pmmp\encoding\VarInt;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
-use pocketmine\network\mcpe\protocol\PacketDecodeException;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\types\GetTypeIdFromConstTrait;
-use function count;
+use pocketmine\network\mcpe\protocol\types\HandSlot;
 
 class UseItemTransactionData extends TransactionData{
 	use GetTypeIdFromConstTrait;
@@ -53,6 +51,7 @@ class UseItemTransactionData extends TransactionData{
 	private BlockPosition $blockPosition;
 	private int $face;
 	private int $hotbarSlot;
+	private HandSlot $handSlot;
 	private ItemStackWrapper $itemInHand;
 	private Vector3 $playerPosition;
 	private Vector3 $clickPosition;
@@ -78,6 +77,10 @@ class UseItemTransactionData extends TransactionData{
 		return $this->hotbarSlot;
 	}
 
+	public function getHandSlot() : HandSlot{
+		return $this->handSlot;
+	}
+
 	public function getItemInHand() : ItemStackWrapper{
 		return $this->itemInHand;
 	}
@@ -98,42 +101,13 @@ class UseItemTransactionData extends TransactionData{
 
 	public function getClientCooldownState() : int{ return $this->clientCooldownState; }
 
-	/**
-	 * PlayerAuthInputPacket frames this transaction differently from InventoryTransactionPacket: the action list is
-	 * optional, but the fields after it are always present.
-	 *
-	 * @throws DataDecodeException
-	 * @throws PacketDecodeException
-	 */
-	public function decodeFromItemInteraction(ByteBufferReader $in) : void{
-		$hasActions = CommonTypes::getBool($in);
-		$hasTransactionData = CommonTypes::getBool($in);
-
-		if($hasActions && $hasTransactionData){
-			$actionCount = VarInt::readUnsignedInt($in);
-			for($i = 0; $i < $actionCount; ++$i){
-				$this->actions[] = (new NetworkInventoryAction())->read($in);
-			}
-		}
-		$this->decodeData($in);
-	}
-
-	public function encodeForItemInteraction(ByteBufferWriter $out) : void{
-		CommonTypes::putBool($out, true);
-		CommonTypes::putBool($out, true);
-		VarInt::writeUnsignedInt($out, count($this->actions));
-		foreach($this->actions as $action){
-			$action->write($out);
-		}
-		$this->encodeData($out);
-	}
-
 	protected function decodeData(ByteBufferReader $in) : void{
 		$this->actionType = VarInt::readSignedInt($in);
 		$this->triggerType = TriggerType::fromPacket(Byte::readUnsigned($in));
 		$this->blockPosition = CommonTypes::getBlockPosition($in);
 		$this->face = Byte::readUnsigned($in);
 		$this->hotbarSlot = VarInt::readSignedInt($in);
+		$this->handSlot = HandSlot::fromPacket(Byte::readUnsigned($in));
 		$this->itemInHand = CommonTypes::getNetworkItemStackDescriptor($in);
 		$this->playerPosition = CommonTypes::getVector3($in);
 		$this->clickPosition = CommonTypes::getVector3($in);
@@ -148,6 +122,7 @@ class UseItemTransactionData extends TransactionData{
 		CommonTypes::putBlockPosition($out, $this->blockPosition);
 		Byte::writeUnsigned($out, $this->face);
 		VarInt::writeSignedInt($out, $this->hotbarSlot);
+		Byte::writeUnsigned($out, $this->handSlot->value);
 		CommonTypes::putNetworkItemStackDescriptor($out, $this->itemInHand);
 		CommonTypes::putVector3($out, $this->playerPosition);
 		CommonTypes::putVector3($out, $this->clickPosition);
@@ -165,6 +140,7 @@ class UseItemTransactionData extends TransactionData{
 		BlockPosition $blockPosition,
 		int $face,
 		int $hotbarSlot,
+		HandSlot $handSlot,
 		ItemStackWrapper $itemInHand,
 		Vector3 $playerPosition,
 		Vector3 $clickPosition,
@@ -178,6 +154,7 @@ class UseItemTransactionData extends TransactionData{
 		$result->blockPosition = $blockPosition;
 		$result->face = $face;
 		$result->hotbarSlot = $hotbarSlot;
+		$result->handSlot = $handSlot;
 		$result->itemInHand = $itemInHand;
 		$result->playerPosition = $playerPosition;
 		$result->clickPosition = $clickPosition;
@@ -190,8 +167,8 @@ class UseItemTransactionData extends TransactionData{
 	/**
 	 * @param NetworkInventoryAction[] $actions
 	 */
-	public static function new(array $actions, int $actionType, TriggerType $triggerType, BlockPosition $blockPosition, int $face, int $hotbarSlot, ItemStackWrapper $itemInHand, Vector3 $playerPosition, Vector3 $clickPosition, int $blockRuntimeId, PredictedResult $clientInteractPrediction, int $clientCooldownState) : self{
-		$result = self::initSelf($actionType, $triggerType, $blockPosition, $face, $hotbarSlot, $itemInHand, $playerPosition, $clickPosition, $blockRuntimeId, $clientInteractPrediction, $clientCooldownState);
+	public static function new(array $actions, int $actionType, TriggerType $triggerType, BlockPosition $blockPosition, int $face, int $hotbarSlot, HandSlot $handSlot, ItemStackWrapper $itemInHand, Vector3 $playerPosition, Vector3 $clickPosition, int $blockRuntimeId, PredictedResult $clientInteractPrediction, int $clientCooldownState) : self{
+		$result = self::initSelf($actionType, $triggerType, $blockPosition, $face, $hotbarSlot, $handSlot, $itemInHand, $playerPosition, $clickPosition, $blockRuntimeId, $clientInteractPrediction, $clientCooldownState);
 		$result->actions = $actions;
 		return $result;
 	}

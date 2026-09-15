@@ -58,7 +58,6 @@ class BossEventPacket extends DataPacket implements ClientboundPacket, Serverbou
 	public int $bossActorUniqueId;
 	public int $eventType;
 
-	public int $playerActorUniqueId = 0;
 	public float $healthPercent = 0.0;
 	public string $title = "";
 	public string $filteredTitle = "";
@@ -86,16 +85,12 @@ class BossEventPacket extends DataPacket implements ClientboundPacket, Serverbou
 		return self::base($bossActorUniqueId, self::TYPE_HIDE);
 	}
 
-	public static function registerPlayer(int $bossActorUniqueId, int $playerActorUniqueId) : self{
-		$result = self::base($bossActorUniqueId, self::TYPE_REGISTER_PLAYER);
-		$result->playerActorUniqueId = $playerActorUniqueId;
-		return $result;
+	public static function registerPlayer(int $bossActorUniqueId) : self{
+		return self::base($bossActorUniqueId, self::TYPE_REGISTER_PLAYER);
 	}
 
-	public static function unregisterPlayer(int $bossActorUniqueId, int $playerActorUniqueId) : self{
-		$result = self::base($bossActorUniqueId, self::TYPE_UNREGISTER_PLAYER);
-		$result->playerActorUniqueId = $playerActorUniqueId;
-		return $result;
+	public static function unregisterPlayer(int $bossActorUniqueId) : self{
+		return self::base($bossActorUniqueId, self::TYPE_UNREGISTER_PLAYER);
 	}
 
 	public static function healthPercent(int $bossActorUniqueId, float $healthPercent) : self{
@@ -118,15 +113,12 @@ class BossEventPacket extends DataPacket implements ClientboundPacket, Serverbou
 		return $result;
 	}
 
-	public static function query(int $bossActorUniqueId, int $playerActorUniqueId) : self{
-		$result = self::base($bossActorUniqueId, self::TYPE_QUERY);
-		$result->playerActorUniqueId = $playerActorUniqueId;
-		return $result;
+	public static function query(int $bossActorUniqueId) : self{
+		return self::base($bossActorUniqueId, self::TYPE_QUERY);
 	}
 
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$this->bossActorUniqueId = CommonTypes::getActorUniqueId($in);
-		$this->playerActorUniqueId = CommonTypes::getActorUniqueId($in);
 		$this->eventType = Byte::readUnsigned($in);
 		$this->title = CommonTypes::getString($in);
 		$this->filteredTitle = CommonTypes::getString($in);
@@ -137,7 +129,6 @@ class BossEventPacket extends DataPacket implements ClientboundPacket, Serverbou
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
 		CommonTypes::putActorUniqueId($out, $this->bossActorUniqueId);
-		CommonTypes::putActorUniqueId($out, $this->playerActorUniqueId);
 		Byte::writeUnsigned($out, $this->eventType);
 		CommonTypes::putString($out, $this->title);
 		CommonTypes::putString($out, $this->filteredTitle);

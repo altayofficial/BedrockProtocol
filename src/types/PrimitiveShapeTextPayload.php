@@ -40,6 +40,7 @@ final class PrimitiveShapeTextPayload extends PrimitiveShapePayload{
 		private string $text,
 		private bool $useRotation,
 		private ?Color $backgroundColor,
+		private float $lineGapHeight,
 		private bool $depthTest,
 		private bool $showBackface,
 		private bool $showTextBackface,
@@ -47,24 +48,34 @@ final class PrimitiveShapeTextPayload extends PrimitiveShapePayload{
 
 	public function getText() : string{ return $this->text; }
 
-	public function useRotation() : bool{ return $this->useRotation; }
+	public function getUseRotation() : bool{ return $this->useRotation; }
 
 	public function getBackgroundColor() : ?Color{ return $this->backgroundColor; }
 
-	public function hasDepthTest() : bool{ return $this->depthTest; }
+	public function getLineGapHeight() : float{ return $this->lineGapHeight; }
 
-	public function hasShowBackface() : bool{ return $this->showBackface; }
+	public function getDepthTest() : bool{ return $this->depthTest; }
 
-	public function hasShowTextBackface() : bool{ return $this->showTextBackface; }
+	public function getShowBackface() : bool{ return $this->showBackface; }
+
+	public function getShowTextBackface() : bool{ return $this->showTextBackface; }
 
 	public static function read(ByteBufferReader $in) : self{
+		$text = CommonTypes::getString($in);
+		$useRotation = CommonTypes::getBool($in);
+		$backgroundColor = CommonTypes::readOptional($in, fn() => Color::fromARGB(LE::readUnsignedInt($in)));
+		$lineGapHeight = LE::readFloat($in);
+		$depthTest = CommonTypes::getBool($in);
+		$showBackface = CommonTypes::getBool($in);
+		$showTextBackface = CommonTypes::getBool($in);
 		return new self(
-			CommonTypes::getString($in),
-			CommonTypes::getBool($in),
-			CommonTypes::readOptional($in, fn() => Color::fromARGB(LE::readUnsignedInt($in))),
-			CommonTypes::getBool($in),
-			CommonTypes::getBool($in),
-			CommonTypes::getBool($in),
+			$text,
+			$useRotation,
+			$backgroundColor,
+			$lineGapHeight,
+			$depthTest,
+			$showBackface,
+			$showTextBackface
 		);
 	}
 
@@ -72,6 +83,7 @@ final class PrimitiveShapeTextPayload extends PrimitiveShapePayload{
 		CommonTypes::putString($out, $this->text);
 		CommonTypes::putBool($out, $this->useRotation);
 		CommonTypes::writeOptional($out, $this->backgroundColor, fn(ByteBufferWriter $out, Color $color) => LE::writeUnsignedInt($out, $color->toARGB()));
+		LE::writeFloat($out, $this->lineGapHeight);
 		CommonTypes::putBool($out, $this->depthTest);
 		CommonTypes::putBool($out, $this->showBackface);
 		CommonTypes::putBool($out, $this->showTextBackface);
