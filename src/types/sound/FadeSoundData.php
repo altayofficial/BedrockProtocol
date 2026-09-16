@@ -39,7 +39,7 @@ final class FadeSoundData extends SoundData{
 
 	public function getTargetVolume() : float{ return $this->targetVolume; }
 
-	public function getEvent() : SoundDataEvent{ return SoundDataEvent::FADE; }
+	public function getEvent() : SoundDataEventType{ return SoundDataEventType::FADE; }
 
 	protected function writeData(ByteBufferWriter $out) : void{
 		LE::writeFloat($out, $this->duration);
