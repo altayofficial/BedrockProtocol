@@ -34,75 +34,33 @@ class ClientboundUpdateSoundDataPacket extends DataPacket implements Clientbound
 	public const NETWORK_ID = ProtocolInfo::CLIENTBOUND_UPDATE_SOUND_DATA_PACKET;
 
 	private int $serverSoundHandle;
-	private SoundData $stop;
-	private SoundData $setVolume;
-	private SoundData $setPitch;
-	private SoundData $fade;
-	private SoundData $seekTo;
-	private SoundData $pause;
-	private SoundData $resume;
+	private SoundData $event;
 
 	/**
 	 * @generate-create-func
 	 */
 	public static function create(
 		int $serverSoundHandle,
-		SoundData $stop,
-		SoundData $setVolume,
-		SoundData $setPitch,
-		SoundData $fade,
-		SoundData $seekTo,
-		SoundData $pause,
-		SoundData $resume,
+		SoundData $event,
 	) : self{
 		$result = new self;
 		$result->serverSoundHandle = $serverSoundHandle;
-		$result->stop = $stop;
-		$result->setVolume = $setVolume;
-		$result->setPitch = $setPitch;
-		$result->fade = $fade;
-		$result->seekTo = $seekTo;
-		$result->pause = $pause;
-		$result->resume = $resume;
+		$result->event = $event;
 		return $result;
 	}
 
 	public function getServerSoundHandle() : int{ return $this->serverSoundHandle; }
 
-	public function getStop() : SoundData{ return $this->stop; }
-
-	public function getSetVolume() : SoundData{ return $this->setVolume; }
-
-	public function getSetPitch() : SoundData{ return $this->setPitch; }
-
-	public function getFade() : SoundData{ return $this->fade; }
-
-	public function getSeekTo() : SoundData{ return $this->seekTo; }
-
-	public function getPause() : SoundData{ return $this->pause; }
-
-	public function getResume() : SoundData{ return $this->resume; }
+	public function getEvent() : SoundData{ return $this->event; }
 
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$this->serverSoundHandle = LE::readUnsignedLong($in);
-		$this->stop = SoundData::read($in);
-		$this->setVolume = SoundData::read($in);
-		$this->setPitch = SoundData::read($in);
-		$this->fade = SoundData::read($in);
-		$this->seekTo = SoundData::read($in);
-		$this->pause = SoundData::read($in);
-		$this->resume = SoundData::read($in);
+		$this->event = SoundData::read($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
 		LE::writeUnsignedLong($out, $this->serverSoundHandle);
-		$this->stop->write($out);
-		$this->setVolume->write($out);
-		$this->setPitch->write($out);
-		$this->fade->write($out);
-		$this->seekTo->write($out);
-		$this->pause->write($out);
-		$this->resume->write($out);
+		$this->event->write($out);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

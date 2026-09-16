@@ -36,7 +36,7 @@ final class SetPitchSoundData extends SoundData{
 
 	public function getPitch() : float{ return $this->pitch; }
 
-	public function getEvent() : SoundDataEvent{ return SoundDataEvent::SET_PITCH; }
+	public function getEvent() : SoundDataEventType{ return SoundDataEventType::SET_PITCH; }
 
 	protected function writeData(ByteBufferWriter $out) : void{
 		LE::writeFloat($out, $this->pitch);
