@@ -252,7 +252,7 @@ final class PacketShapeData{
 		$maximumRenderDistance = CommonTypes::readOptional($in, LE::readFloat(...));
 		$color = CommonTypes::readOptional($in, fn() => Color::fromARGB(LE::readUnsignedInt($in)));
 		$dimensionId = CommonTypes::readOptional($in, fn() => VarInt::readSignedInt($in));
-		$attachedToEntityId = CommonTypes::readOptional($in, fn() => CommonTypes::getActorRuntimeId($in));
+		$attachedToEntityId = CommonTypes::readOptional($in, CommonTypes::getActorUniqueId(...)); // lol what, Mojang
 
 		$payloadType = VarInt::readUnsignedInt($in);
 		//WTF IS THIS HORROR SHOW
@@ -302,7 +302,7 @@ final class PacketShapeData{
 		CommonTypes::writeOptional($out, $this->maximumRenderDistance, LE::writeFloat(...));
 		CommonTypes::writeOptional($out, $this->color, fn(ByteBufferWriter $out, Color $color) => LE::writeUnsignedInt($out, $color->toARGB()));
 		CommonTypes::writeOptional($out, $this->dimensionId, fn(ByteBufferWriter $out, int $dimensionId) => VarInt::writeSignedInt($out, $dimensionId));
-		CommonTypes::writeOptional($out, $this->attachedToEntityId, fn(ByteBufferWriter $out, int $entityId) => CommonTypes::putActorRuntimeId($out, $entityId));
+		CommonTypes::writeOptional($out, $this->attachedToEntityId, CommonTypes::putActorUniqueId(...));
 
 		VarInt::writeUnsignedInt($out, $this->payload?->getTypeId() ?? PrimitiveShapeType::PAYLOAD_TYPE_NONE);
 		$this->payload?->write($out);
