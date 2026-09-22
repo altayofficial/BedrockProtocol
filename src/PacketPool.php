@@ -281,6 +281,7 @@ class PacketPool{
 		$this->registerPacket(new ClientboundStonecutterSetRecipePacket());
 		$this->registerPacket(new ServerboundStonecutterSetRecipePacket());
 		$this->registerPacket(new ServerboundMatchmakingCancelPacket());
+		$this->registerPacket(new SetPassengerOfBlockPacket());
 	}
 
 	public function registerPacket(Packet $packet) : void{

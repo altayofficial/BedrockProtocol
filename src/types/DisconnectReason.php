@@ -176,4 +176,5 @@ enum DisconnectReason : int {
 	case EDITOR_NOT_ALLOWED = 147;
 	case MISSING_STRUCTURE_DATA = 148;
 	case UNSUPPORTED_TRANSPORT = 149;
+	case SUB_CLIENT_LOGIN_NOT_BOUND = 150;
 }
