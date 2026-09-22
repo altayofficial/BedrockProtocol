@@ -25,16 +25,9 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types;
 
-enum MatchmakingState : int{
+enum EditorLevelMigrationVersion : int{
 	use PacketIntEnumTrait;
 
-	case IDLE = 0;
-	case MATCHMAKING = 1;
-	case MATCH_FOUND = 2;
-	case CANCELED = 3;
-	case PLAYER_LEFT_PARTY = 4;
-	case PLAYER_LEFT_SERVER = 5;
-	case SERVER_SHUTDOWN = 6;
-	case TIMED_OUT = 7;
-	case REQUEUE_AS_PARTY = 8;
+	case LEGACY = 0;
+	case EDITOR_ACHIEVEMENTS = 1;
 }
