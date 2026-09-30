@@ -98,4 +98,8 @@ final class ContainerUIIds{
 	public const RECIPE_FOOD_CONTAINER = 64;
 	public const RECIPE_BLOCKS_CONTAINER = 65;
 	public const RECIPE_FURNACE_ITEMS_CONTAINER = 66;
+	public const RESERVED_A = 67;
+	public const RESERVED_B = 68;
+	public const RESERVED_C = 69;
+	public const RESERVED_D = 70;
 }
