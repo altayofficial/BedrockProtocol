@@ -54,7 +54,7 @@ final class AttributeUpdateLayerSettings extends AttributeLayerSyncPayload{
 
 	public static function read(ByteBufferReader $in) : self{
 		$name = CommonTypes::getString($in);
-		$dimension = VarInt::readUnsignedInt($in);
+		$dimension = VarInt::readSignedInt($in);
 		$settings = AttributeLayerSettings::read($in);
 
 		return new self(
@@ -66,7 +66,7 @@ final class AttributeUpdateLayerSettings extends AttributeLayerSyncPayload{
 
 	public function write(ByteBufferWriter $out) : void{
 		CommonTypes::putString($out, $this->name);
-		VarInt::writeUnsignedInt($out, $this->dimension);
+		VarInt::writeSignedInt($out, $this->dimension);
 		$this->settings->write($out);
 	}
 }

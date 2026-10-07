@@ -65,7 +65,7 @@ final class AttributeNoiseTransitionSettings{
 	public static function read(ByteBufferReader $in) : self{
 		$totalTransitionTicks = VarInt::readUnsignedInt($in);
 		$currentTransitionTicks = VarInt::readUnsignedInt($in);
-		$easeType = VarInt::readUnsignedInt($in);
+		$easeType = VarInt::readSignedInt($in);
 		$clockName = CommonTypes::getString($in);
 		$localTransitionTicks = VarInt::readUnsignedInt($in);
 		$noiseName = CommonTypes::getString($in);
@@ -85,7 +85,7 @@ final class AttributeNoiseTransitionSettings{
 	public function write(ByteBufferWriter $out) : void{
 		VarInt::writeUnsignedInt($out, $this->totalTransitionTicks);
 		VarInt::writeUnsignedInt($out, $this->currentTransitionTicks);
-		VarInt::writeUnsignedInt($out, $this->easeType);
+		VarInt::writeSignedInt($out, $this->easeType);
 		CommonTypes::putString($out, $this->clockName);
 		VarInt::writeUnsignedInt($out, $this->localTransitionTicks);
 		CommonTypes::putString($out, $this->noiseName);

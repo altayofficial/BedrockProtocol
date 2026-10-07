@@ -26,9 +26,9 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol;
 
-use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\audio\AudioContentPlaybackType;
 use pocketmine\network\mcpe\protocol\types\audio\SignedAudioContent;
 
@@ -63,7 +63,7 @@ class ClientboundPlayAudioContentPacket extends DataPacket implements Clientboun
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$this->sharedMetadata = SignedAudioContent::read($in);
 		$this->playbackContent = SignedAudioContent::read($in);
-		$this->playbackType = AudioContentPlaybackType::fromPacket(Byte::readUnsigned($in));
+		$this->playbackType = AudioContentPlaybackType::fromPacket(CommonTypes::getString($in));
 
 		$this->playSound = new PlaySoundPacket();
 		$this->playSound->decodePayload($in);
@@ -72,7 +72,7 @@ class ClientboundPlayAudioContentPacket extends DataPacket implements Clientboun
 	protected function encodePayload(ByteBufferWriter $out) : void{
 		$this->sharedMetadata->write($out);
 		$this->playbackContent->write($out);
-		Byte::writeUnsigned($out, $this->playbackType->value);
+		CommonTypes::putString($out, $this->playbackType->value);
 		$this->playSound->encodePayload($out);
 	}
 

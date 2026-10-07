@@ -26,11 +26,16 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types\audio;
 
-use pocketmine\network\mcpe\protocol\types\PacketIntEnumTrait;
+use pocketmine\network\mcpe\protocol\PacketDecodeException;
 
-enum AudioContentPlaybackType : int{
-	use PacketIntEnumTrait;
+enum AudioContentPlaybackType : string{
+	case MUSIC = "Music";
+	case SOUND = "Sound";
 
-	case MUSIC = 0;
-	case SOUND = 1;
+	/**
+	 * @throws PacketDecodeException
+	 */
+	public static function fromPacket(string $value) : self{
+		return self::tryFrom($value) ?? throw new PacketDecodeException("Invalid raw value $value for " . self::class);
+	}
 }
