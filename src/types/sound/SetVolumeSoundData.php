@@ -36,7 +36,7 @@ final class SetVolumeSoundData extends SoundData{
 
 	public function getVolume() : float{ return $this->volume; }
 
-	public function getEvent() : SoundDataEvent{ return SoundDataEvent::SET_VOLUME; }
+	public function getEvent() : SoundDataEventType{ return SoundDataEventType::SET_VOLUME; }
 
 	protected function writeData(ByteBufferWriter $out) : void{
 		LE::writeFloat($out, $this->volume);

@@ -36,7 +36,7 @@ final class SeekToSoundData extends SoundData{
 
 	public function getSeconds() : float{ return $this->seconds; }
 
-	public function getEvent() : SoundDataEvent{ return SoundDataEvent::SEEK_TO; }
+	public function getEvent() : SoundDataEventType{ return SoundDataEventType::SEEK_TO; }
 
 	protected function writeData(ByteBufferWriter $out) : void{
 		LE::writeFloat($out, $this->seconds);

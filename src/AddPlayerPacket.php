@@ -36,6 +36,7 @@ use pocketmine\network\mcpe\protocol\types\entity\EntityLink;
 use pocketmine\network\mcpe\protocol\types\entity\MetadataProperty;
 use pocketmine\network\mcpe\protocol\types\entity\PropertySyncData;
 use pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper;
+use pocketmine\network\mcpe\protocol\types\PassengerOfBlockArguments;
 use Ramsey\Uuid\UuidInterface;
 use function count;
 
@@ -64,6 +65,7 @@ class AddPlayerPacket extends DataPacket implements ClientboundPacket{
 
 	/** @var EntityLink[] */
 	public array $links = [];
+	public ?PassengerOfBlockArguments $passengerOfBlockData = null;
 	public string $deviceId = ""; //TODO: fill player's device ID (???)
 	public int $buildPlatform = DeviceOS::UNKNOWN;
 
@@ -89,6 +91,7 @@ class AddPlayerPacket extends DataPacket implements ClientboundPacket{
 		PropertySyncData $syncedProperties,
 		UpdateAbilitiesPacket $abilitiesPacket,
 		array $links,
+		?PassengerOfBlockArguments $passengerOfBlockData,
 		string $deviceId,
 		int $buildPlatform,
 	) : self{
@@ -108,6 +111,7 @@ class AddPlayerPacket extends DataPacket implements ClientboundPacket{
 		$result->syncedProperties = $syncedProperties;
 		$result->abilitiesPacket = $abilitiesPacket;
 		$result->links = $links;
+		$result->passengerOfBlockData = $passengerOfBlockData;
 		$result->deviceId = $deviceId;
 		$result->buildPlatform = $buildPlatform;
 		return $result;
@@ -136,6 +140,8 @@ class AddPlayerPacket extends DataPacket implements ClientboundPacket{
 			$this->links[$i] = CommonTypes::getEntityLink($in);
 		}
 
+		$this->passengerOfBlockData = CommonTypes::readOptional($in, PassengerOfBlockArguments::read(...));
+
 		$this->deviceId = CommonTypes::getString($in);
 		$this->buildPlatform = LE::readSignedInt($in);
 	}
@@ -161,6 +167,8 @@ class AddPlayerPacket extends DataPacket implements ClientboundPacket{
 		foreach($this->links as $link){
 			CommonTypes::putEntityLink($out, $link);
 		}
+
+		CommonTypes::writeOptional($out, $this->passengerOfBlockData, fn(ByteBufferWriter $out, PassengerOfBlockArguments $data) => $data->write($out));
 
 		CommonTypes::putString($out, $this->deviceId);
 		LE::writeSignedInt($out, $this->buildPlatform);

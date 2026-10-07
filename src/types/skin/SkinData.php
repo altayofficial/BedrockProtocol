@@ -49,7 +49,6 @@ class SkinData{
 	 */
 	public function __construct(
 		private string $skinId,
-		private string $playFabId,
 		private string $resourcePatch,
 		private SkinImage $skinImage,
 		private array $animations = [],
@@ -80,8 +79,6 @@ class SkinData{
 	public function getSkinId() : string{
 		return $this->skinId;
 	}
-
-	public function getPlayFabId() : string{ return $this->playFabId; }
 
 	public function getResourcePatch() : string{
 		return $this->resourcePatch;

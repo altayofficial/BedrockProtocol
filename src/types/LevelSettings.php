@@ -48,6 +48,7 @@ final class LevelSettings{
 	public int $editorWorldType = EditorWorldType::NON_EDITOR;
 	public bool $createdInEditorMode = false;
 	public bool $exportedFromEditorMode = false;
+	public EditorLevelMigrationVersion $editorLevelMigrationVersion = EditorLevelMigrationVersion::LEGACY;
 	public int $time = -1;
 	public int $eduEditionOffer = EducationEditionOffer::NONE;
 	public bool $hasEduFeaturesEnabled = false;
@@ -122,6 +123,7 @@ final class LevelSettings{
 		$this->editorWorldType = VarInt::readSignedInt($in);
 		$this->createdInEditorMode = CommonTypes::getBool($in);
 		$this->exportedFromEditorMode = CommonTypes::getBool($in);
+		$this->editorLevelMigrationVersion = EditorLevelMigrationVersion::fromPacket(Byte::readSigned($in));
 		$this->time = VarInt::readSignedInt($in);
 		$this->eduEditionOffer = VarInt::readUnsignedInt($in);
 		$this->hasEduFeaturesEnabled = CommonTypes::getBool($in);
@@ -175,6 +177,7 @@ final class LevelSettings{
 		VarInt::writeSignedInt($out, $this->editorWorldType);
 		CommonTypes::putBool($out, $this->createdInEditorMode);
 		CommonTypes::putBool($out, $this->exportedFromEditorMode);
+		Byte::writeSigned($out, $this->editorLevelMigrationVersion->value);
 		VarInt::writeSignedInt($out, $this->time);
 		VarInt::writeUnsignedInt($out, $this->eduEditionOffer);
 		CommonTypes::putBool($out, $this->hasEduFeaturesEnabled);
