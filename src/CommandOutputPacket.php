@@ -74,6 +74,7 @@ class CommandOutputPacket extends DataPacket implements ClientboundPacket{
 		for($i = 0, $size = VarInt::readUnsignedInt($in); $i < $size; ++$i){
 			$message->parameters[] = CommonTypes::getString($in);
 		}
+		$message->rawMessage = CommonTypes::readOptional($in, CommonTypes::getString(...));
 
 		return $message;
 	}
@@ -99,6 +100,7 @@ class CommandOutputPacket extends DataPacket implements ClientboundPacket{
 		foreach($message->parameters as $parameter){
 			CommonTypes::putString($out, $parameter);
 		}
+		CommonTypes::writeOptional($out, $message->rawMessage, CommonTypes::putString(...));
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

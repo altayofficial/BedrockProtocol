@@ -44,6 +44,7 @@ abstract class AttributeValue{
 			AttributeValueBool::ID => AttributeValueBool::read($in),
 			AttributeValueFloat::ID => AttributeValueFloat::read($in),
 			AttributeValueColor::ID => AttributeValueColor::read($in),
+			AttributeValueString::ID => AttributeValueString::read($in),
 			default => throw new PacketDecodeException("Unknown AttributeValue type"),
 		};
 	}

@@ -327,10 +327,6 @@ interface PacketHandlerInterface{
 
 	public function handleSyncActorProperty(SyncActorPropertyPacket $packet) : bool;
 
-	public function handleAddVolumeEntity(AddVolumeEntityPacket $packet) : bool;
-
-	public function handleRemoveVolumeEntity(RemoveVolumeEntityPacket $packet) : bool;
-
 	public function handleSimulationType(SimulationTypePacket $packet) : bool;
 
 	public function handleNpcDialogue(NpcDialoguePacket $packet) : bool;
@@ -506,4 +502,6 @@ interface PacketHandlerInterface{
 	public function handleClientboundPlayAudioContent(ClientboundPlayAudioContentPacket $packet) : bool;
 
 	public function handleServerboundRegisterAudioContent(ServerboundRegisterAudioContentPacket $packet) : bool;
+
+	public function handleChat(ChatPacket $packet) : bool;
 }
