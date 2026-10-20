@@ -504,4 +504,8 @@ interface PacketHandlerInterface{
 	public function handleServerboundRegisterAudioContent(ServerboundRegisterAudioContentPacket $packet) : bool;
 
 	public function handleChat(ChatPacket $packet) : bool;
+
+	public function handleServerboundRequestOnlineMusicPlayback(ServerboundRequestOnlineMusicPlaybackPacket $packet) : bool;
+
+	public function handleClientboundOnlineMusicPlaybackResponse(ClientboundOnlineMusicPlaybackResponsePacket $packet) : bool;
 }

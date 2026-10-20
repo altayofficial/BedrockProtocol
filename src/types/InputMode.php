@@ -34,4 +34,5 @@ final class InputMode{
 	public const MOUSE_KEYBOARD = 1;
 	public const TOUCHSCREEN = 2;
 	public const GAME_PAD = 3;
+	public const GAME_PAD_AND_MOUSE = 4;
 }

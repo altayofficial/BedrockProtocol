@@ -984,4 +984,12 @@ trait PacketHandlerDefaultImplTrait{
 	public function handleChat(ChatPacket $packet) : bool{
 		return false;
 	}
+
+	public function handleServerboundRequestOnlineMusicPlayback(ServerboundRequestOnlineMusicPlaybackPacket $packet) : bool{
+		return false;
+	}
+
+	public function handleClientboundOnlineMusicPlaybackResponse(ClientboundOnlineMusicPlaybackResponsePacket $packet) : bool{
+		return false;
+	}
 }
