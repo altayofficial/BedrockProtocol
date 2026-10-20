@@ -47,7 +47,7 @@ final class ItemStackRequestActionType{
 	public const CRAFTING_RECIPE_OPTIONAL = 13; //anvil/cartography table rename
 	public const CRAFTING_GRINDSTONE = 14;
 	public const CRAFTING_LOOM = 15;
-	public const CRAFTING_RESERVED = 16;
+	public const CRAFTING_DISC_PRESS = 16;
 	public const CRAFTING_NON_IMPLEMENTED_DEPRECATED_ASK_TY_LAING = 17;
 	public const CRAFTING_RESULTS_DEPRECATED_ASK_TY_LAING = 18; //no idea what this is for
 
