@@ -30,6 +30,7 @@ use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\DataDecodeException;
 use pmmp\encoding\LE;
+use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\PacketDecodeException;
 
 abstract class SoundData{
@@ -41,7 +42,12 @@ abstract class SoundData{
 	 * @throws DataDecodeException
 	 */
 	public static function read(ByteBufferReader $in) : self{
+		// yeah, the variant index and the type tag inside the variant are always the same value, but both go on the wire
+		$variant = VarInt::readUnsignedInt($in);
 		$event = SoundDataEventType::fromPacket(Byte::readUnsigned($in));
+		if($variant !== $event->value){
+			throw new PacketDecodeException("Sound data variant index $variant does not match event type " . $event->value);
+		}
 		return match($event){
 			SoundDataEventType::STOP => new StopSoundData(),
 			SoundDataEventType::SET_VOLUME => new SetVolumeSoundData(LE::readFloat($in)),
@@ -54,6 +60,7 @@ abstract class SoundData{
 	}
 
 	public function write(ByteBufferWriter $out) : void{
+		VarInt::writeUnsignedInt($out, $this->getEvent()->value);
 		Byte::writeUnsigned($out, $this->getEvent()->value);
 		$this->writeData($out);
 	}
