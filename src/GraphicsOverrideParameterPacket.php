@@ -41,8 +41,8 @@ class GraphicsOverrideParameterPacket extends DataPacket implements ClientboundP
 
 	/** @var ParameterKeyframeValue[] */
 	private array $values = [];
-	private ?float $unknownFloat;
-	private ?Vector3 $unknownVector3;
+	private ?float $floatValue;
+	private ?Vector3 $vec3Value;
 	private string $biomeIdentifier;
 	private ?string $playerIdentifier;
 	private GraphicsOverrideParameterType $parameterType;
@@ -54,8 +54,8 @@ class GraphicsOverrideParameterPacket extends DataPacket implements ClientboundP
 	 */
 	public static function create(
 		array $values,
-		?float $unknownFloat,
-		?Vector3 $unknownVector3,
+		?float $floatValue,
+		?Vector3 $vec3Value,
 		string $biomeIdentifier,
 		?string $playerIdentifier,
 		GraphicsOverrideParameterType $parameterType,
@@ -63,8 +63,8 @@ class GraphicsOverrideParameterPacket extends DataPacket implements ClientboundP
 	) : self{
 		$result = new self;
 		$result->values = $values;
-		$result->unknownFloat = $unknownFloat;
-		$result->unknownVector3 = $unknownVector3;
+		$result->floatValue = $floatValue;
+		$result->vec3Value = $vec3Value;
 		$result->biomeIdentifier = $biomeIdentifier;
 		$result->playerIdentifier = $playerIdentifier;
 		$result->parameterType = $parameterType;
@@ -77,9 +77,9 @@ class GraphicsOverrideParameterPacket extends DataPacket implements ClientboundP
 	 */
 	public function getValues() : array{ return $this->values; }
 
-	public function getUnknownFloat() : ?float{ return $this->unknownFloat; }
+	public function getFloatValue() : ?float{ return $this->floatValue; }
 
-	public function getUnknownVector3() : ?Vector3{ return $this->unknownVector3; }
+	public function getVec3Value() : ?Vector3{ return $this->vec3Value; }
 
 	public function getBiomeIdentifier() : string{ return $this->biomeIdentifier; }
 
@@ -94,8 +94,8 @@ class GraphicsOverrideParameterPacket extends DataPacket implements ClientboundP
 		for($i = 0; $i < $count; ++$i){
 			$this->values[] = ParameterKeyframeValue::read($in);
 		}
-		$this->unknownFloat = CommonTypes::readOptional($in, LE::readFloat(...));
-		$this->unknownVector3 = CommonTypes::readOptional($in, CommonTypes::getVector3(...));
+		$this->floatValue = CommonTypes::readOptional($in, LE::readFloat(...));
+		$this->vec3Value = CommonTypes::readOptional($in, CommonTypes::getVector3(...));
 		$this->biomeIdentifier = CommonTypes::getString($in);
 		$this->playerIdentifier = CommonTypes::readOptional($in, CommonTypes::getString(...));
 		$this->parameterType = GraphicsOverrideParameterType::fromPacket(Byte::readUnsigned($in));
@@ -107,8 +107,8 @@ class GraphicsOverrideParameterPacket extends DataPacket implements ClientboundP
 		foreach($this->values as $value){
 			$value->write($out);
 		}
-		CommonTypes::writeOptional($out, $this->unknownFloat, LE::writeFloat(...));
-		CommonTypes::writeOptional($out, $this->unknownVector3, CommonTypes::putVector3(...));
+		CommonTypes::writeOptional($out, $this->floatValue, LE::writeFloat(...));
+		CommonTypes::writeOptional($out, $this->vec3Value, CommonTypes::putVector3(...));
 		CommonTypes::putString($out, $this->biomeIdentifier);
 		CommonTypes::writeOptional($out, $this->playerIdentifier, CommonTypes::putString(...));
 		Byte::writeUnsigned($out, $this->parameterType->value);

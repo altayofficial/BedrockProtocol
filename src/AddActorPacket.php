@@ -35,6 +35,7 @@ use pocketmine\network\mcpe\protocol\types\entity\Attribute;
 use pocketmine\network\mcpe\protocol\types\entity\EntityLink;
 use pocketmine\network\mcpe\protocol\types\entity\MetadataProperty;
 use pocketmine\network\mcpe\protocol\types\entity\PropertySyncData;
+use pocketmine\network\mcpe\protocol\types\PassengerOfBlockArguments;
 use function count;
 
 class AddActorPacket extends DataPacket implements ClientboundPacket{
@@ -60,6 +61,7 @@ class AddActorPacket extends DataPacket implements ClientboundPacket{
 	public PropertySyncData $syncedProperties;
 	/** @var EntityLink[] */
 	public array $links = [];
+	public ?PassengerOfBlockArguments $passengerOfBlockData = null;
 
 	/**
 	 * @generate-create-func
@@ -82,6 +84,7 @@ class AddActorPacket extends DataPacket implements ClientboundPacket{
 		array $metadata,
 		PropertySyncData $syncedProperties,
 		array $links,
+		?PassengerOfBlockArguments $passengerOfBlockData,
 	) : self{
 		$result = new self;
 		$result->actorUniqueId = $actorUniqueId;
@@ -97,6 +100,7 @@ class AddActorPacket extends DataPacket implements ClientboundPacket{
 		$result->metadata = $metadata;
 		$result->syncedProperties = $syncedProperties;
 		$result->links = $links;
+		$result->passengerOfBlockData = $passengerOfBlockData;
 		return $result;
 	}
 
@@ -127,6 +131,7 @@ class AddActorPacket extends DataPacket implements ClientboundPacket{
 		for($i = 0; $i < $linkCount; ++$i){
 			$this->links[] = CommonTypes::getEntityLink($in);
 		}
+		$this->passengerOfBlockData = CommonTypes::readOptional($in, PassengerOfBlockArguments::read(...));
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
@@ -155,6 +160,7 @@ class AddActorPacket extends DataPacket implements ClientboundPacket{
 		foreach($this->links as $link){
 			CommonTypes::putEntityLink($out, $link);
 		}
+		CommonTypes::writeOptional($out, $this->passengerOfBlockData, fn(ByteBufferWriter $out, PassengerOfBlockArguments $data) => $data->write($out));
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

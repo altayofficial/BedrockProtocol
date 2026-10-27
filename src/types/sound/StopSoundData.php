@@ -27,5 +27,5 @@ namespace pocketmine\network\mcpe\protocol\types\sound;
 
 final class StopSoundData extends SoundData{
 
-	public function getEvent() : SoundDataEvent{ return SoundDataEvent::STOP; }
+	public function getEvent() : SoundDataEventType{ return SoundDataEventType::STOP; }
 }

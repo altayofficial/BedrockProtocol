@@ -39,8 +39,8 @@ final class EntityDiagnosticTimingInfo{
 		private string $entity,
 		private int $timeInNS,
 		private int $percentOfTotal,
-		private Vector3 $position,
-		private string $dimension
+		private ?Vector3 $position,
+		private ?string $dimension
 	){}
 
 	public function getDisplayName() : string{ return $this->displayName; }
@@ -56,8 +56,8 @@ final class EntityDiagnosticTimingInfo{
 		$entity = CommonTypes::getString($in);
 		$timeInNS = LE::readUnsignedLong($in);
 		$percentOfTotal = Byte::readUnsigned($in);
-		$position = CommonTypes::getVector3($in);
-		$dimension = CommonTypes::getString($in);
+		$position = CommonTypes::readOptional($in, CommonTypes::getVector3(...));
+		$dimension = CommonTypes::readOptional($in, CommonTypes::getString(...));
 
 		return new self(
 			$displayName,
@@ -74,7 +74,7 @@ final class EntityDiagnosticTimingInfo{
 		CommonTypes::putString($out, $this->entity);
 		LE::writeUnsignedLong($out, $this->timeInNS);
 		Byte::writeUnsigned($out, $this->percentOfTotal);
-		CommonTypes::putVector3($out, $this->position);
-		CommonTypes::putString($out, $this->dimension);
+		CommonTypes::writeOptional($out, $this->position, CommonTypes::putVector3(...));
+		CommonTypes::writeOptional($out, $this->dimension, CommonTypes::putString(...));
 	}
 }

@@ -27,5 +27,5 @@ namespace pocketmine\network\mcpe\protocol\types\sound;
 
 final class ResumeSoundData extends SoundData{
 
-	public function getEvent() : SoundDataEvent{ return SoundDataEvent::RESUME; }
+	public function getEvent() : SoundDataEventType{ return SoundDataEventType::RESUME; }
 }

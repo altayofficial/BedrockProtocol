@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types\inventory;
 
+use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
@@ -32,6 +33,7 @@ use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\GetTypeIdFromConstTrait;
+use pocketmine\network\mcpe\protocol\types\HandSlot;
 
 class UseItemOnEntityTransactionData extends TransactionData{
 	use GetTypeIdFromConstTrait;
@@ -45,6 +47,7 @@ class UseItemOnEntityTransactionData extends TransactionData{
 	private int $actorRuntimeId;
 	private int $actionType;
 	private int $hotbarSlot;
+	private HandSlot $handSlot;
 	private ItemStackWrapper $itemInHand;
 	private Vector3 $playerPosition;
 	private Vector3 $clickPosition;
@@ -59,6 +62,10 @@ class UseItemOnEntityTransactionData extends TransactionData{
 
 	public function getHotbarSlot() : int{
 		return $this->hotbarSlot;
+	}
+
+	public function getHandSlot() : HandSlot{
+		return $this->handSlot;
 	}
 
 	public function getItemInHand() : ItemStackWrapper{
@@ -77,6 +84,7 @@ class UseItemOnEntityTransactionData extends TransactionData{
 		$this->actorRuntimeId = CommonTypes::getActorRuntimeId($in);
 		$this->actionType = VarInt::readUnsignedInt($in);
 		$this->hotbarSlot = VarInt::readSignedInt($in);
+		$this->handSlot = HandSlot::fromPacket(Byte::readUnsigned($in));
 		$this->itemInHand = CommonTypes::getNetworkItemStackDescriptor($in);
 		$this->playerPosition = CommonTypes::getVector3($in);
 		$this->clickPosition = CommonTypes::getVector3($in);
@@ -86,6 +94,7 @@ class UseItemOnEntityTransactionData extends TransactionData{
 		CommonTypes::putActorRuntimeId($out, $this->actorRuntimeId);
 		VarInt::writeUnsignedInt($out, $this->actionType);
 		VarInt::writeSignedInt($out, $this->hotbarSlot);
+		Byte::writeUnsigned($out, $this->handSlot->value);
 		CommonTypes::putNetworkItemStackDescriptor($out, $this->itemInHand);
 		CommonTypes::putVector3($out, $this->playerPosition);
 		CommonTypes::putVector3($out, $this->clickPosition);
@@ -94,11 +103,12 @@ class UseItemOnEntityTransactionData extends TransactionData{
 	/**
 	 * @generate-create-func
 	 */
-	private static function initSelf(int $actorRuntimeId, int $actionType, int $hotbarSlot, ItemStackWrapper $itemInHand, Vector3 $playerPosition, Vector3 $clickPosition) : self{
+	private static function initSelf(int $actorRuntimeId, int $actionType, int $hotbarSlot, HandSlot $handSlot, ItemStackWrapper $itemInHand, Vector3 $playerPosition, Vector3 $clickPosition) : self{
 		$result = new self;
 		$result->actorRuntimeId = $actorRuntimeId;
 		$result->actionType = $actionType;
 		$result->hotbarSlot = $hotbarSlot;
+		$result->handSlot = $handSlot;
 		$result->itemInHand = $itemInHand;
 		$result->playerPosition = $playerPosition;
 		$result->clickPosition = $clickPosition;
@@ -108,8 +118,8 @@ class UseItemOnEntityTransactionData extends TransactionData{
 	/**
 	 * @param NetworkInventoryAction[] $actions
 	 */
-	public static function new(array $actions, int $actorRuntimeId, int $actionType, int $hotbarSlot, ItemStackWrapper $itemInHand, Vector3 $playerPosition, Vector3 $clickPosition) : self{
-		$result = self::initSelf($actorRuntimeId, $actionType, $hotbarSlot, $itemInHand, $playerPosition, $clickPosition);
+	public static function new(array $actions, int $actorRuntimeId, int $actionType, int $hotbarSlot, HandSlot $handSlot, ItemStackWrapper $itemInHand, Vector3 $playerPosition, Vector3 $clickPosition) : self{
+		$result = self::initSelf($actorRuntimeId, $actionType, $hotbarSlot, $handSlot, $itemInHand, $playerPosition, $clickPosition);
 		$result->actions = $actions;
 		return $result;
 	}

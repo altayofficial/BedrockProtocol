@@ -36,6 +36,7 @@ class PlayerListEntry{
 	public string $username;
 	public ?SkinData $skinData = null;
 	public string $xboxUserId;
+	public string $playFabId;
 	public string $platformChatId = "";
 	public int $buildPlatform = DeviceOS::UNKNOWN;
 	public bool $isTeacher = false;
@@ -56,6 +57,7 @@ class PlayerListEntry{
 		string $username,
 		SkinData $skinData,
 		string $xboxUserId = "",
+		string $playFabId = "",
 		string $platformChatId = "",
 		int $buildPlatform = -1,
 		bool $isTeacher = false,
@@ -69,6 +71,7 @@ class PlayerListEntry{
 		$entry->username = $username;
 		$entry->skinData = $skinData;
 		$entry->xboxUserId = $xboxUserId;
+		$entry->playFabId = $playFabId;
 		$entry->platformChatId = $platformChatId;
 		$entry->buildPlatform = $buildPlatform;
 		$entry->isTeacher = $isTeacher;
