@@ -39,34 +39,23 @@ final class DataStoreUpdate extends DataStore{
 	public const ID = DataStoreType::UPDATE;
 
 	public function __construct(
-		private string $name,
-		private string $property,
-		private string $path,
+		private string $variableName,
 		private DataStoreValue $data,
 		private int $updateCount,
-		private int $pathUpdateCount,
 	){}
 
 	public function getTypeId() : int{
 		return self::ID;
 	}
 
-	public function getName() : string{ return $this->name; }
-
-	public function getProperty() : string{ return $this->property; }
-
-	public function getPath() : string{ return $this->path; }
+	public function getVariableName() : string{ return $this->variableName; }
 
 	public function getData() : DataStoreValue{ return $this->data; }
 
 	public function getUpdateCount() : int{ return $this->updateCount; }
 
-	public function getPathUpdateCount() : int{ return $this->pathUpdateCount; }
-
 	public static function read(ByteBufferReader $in) : self{
-		$name = CommonTypes::getString($in);
-		$property = CommonTypes::getString($in);
-		$path = CommonTypes::getString($in);
+		$variableName = CommonTypes::getString($in);
 
 		$data = match(VarInt::readUnsignedInt($in)){
 			DataStoreValueType::DOUBLE => DoubleDataStoreValue::read($in),
@@ -76,25 +65,18 @@ final class DataStoreUpdate extends DataStore{
 		};
 
 		$updateCount = LE::readUnsignedInt($in);
-		$pathUpdateCount = LE::readUnsignedInt($in);
 
 		return new self(
-			$name,
-			$property,
-			$path,
+			$variableName,
 			$data,
 			$updateCount,
-			$pathUpdateCount,
 		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->name);
-		CommonTypes::putString($out, $this->property);
-		CommonTypes::putString($out, $this->path);
+		CommonTypes::putString($out, $this->variableName);
 		VarInt::writeUnsignedInt($out, $this->data->getTypeId());
 		$this->data->write($out);
 		LE::writeUnsignedInt($out, $this->updateCount);
-		LE::writeUnsignedInt($out, $this->pathUpdateCount);
 	}
 }

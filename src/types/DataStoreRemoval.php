@@ -36,24 +36,24 @@ final class DataStoreRemoval extends DataStore{
 	public const ID = DataStoreType::REMOVAL;
 
 	public function __construct(
-		private string $name,
+		private string $variableName,
 	){}
 
 	public function getTypeId() : int{
 		return self::ID;
 	}
 
-	public function getName() : string{ return $this->name; }
+	public function getVariableName() : string{ return $this->variableName; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$name = CommonTypes::getString($in);
+		$variableName = CommonTypes::getString($in);
 
 		return new self(
-			$name,
+			$variableName,
 		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->name);
+		CommonTypes::putString($out, $this->variableName);
 	}
 }

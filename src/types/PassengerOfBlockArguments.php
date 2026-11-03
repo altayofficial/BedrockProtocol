@@ -43,7 +43,8 @@ final class PassengerOfBlockArguments{
 		private Vector3 $offset,
 		private float $rotation,
 		private float $rotationLimit,
-		private PassengerOfBlockEmoteType $emoteType
+		private PassengerOfBlockEmoteType $emoteType,
+		private int $blockType
 	){}
 
 	public function getBlockPosition() : BlockPosition{ return $this->blockPosition; }
@@ -56,19 +57,24 @@ final class PassengerOfBlockArguments{
 
 	public function getEmoteType() : PassengerOfBlockEmoteType{ return $this->emoteType; }
 
+	/** Hashed serialized id of the block the passenger is sitting on */
+	public function getBlockType() : int{ return $this->blockType; }
+
 	public static function read(ByteBufferReader $in) : self{
 		$blockPosition = CommonTypes::getBlockPosition($in);
 		$offset = CommonTypes::getVector3($in);
 		$rotation = LE::readFloat($in);
 		$rotationLimit = LE::readFloat($in);
 		$emoteType = PassengerOfBlockEmoteType::fromPacket(Byte::readUnsigned($in));
+		$blockType = LE::readUnsignedLong($in);
 
 		return new self(
 			$blockPosition,
 			$offset,
 			$rotation,
 			$rotationLimit,
-			$emoteType
+			$emoteType,
+			$blockType
 		);
 	}
 
@@ -78,5 +84,6 @@ final class PassengerOfBlockArguments{
 		LE::writeFloat($out, $this->rotation);
 		LE::writeFloat($out, $this->rotationLimit);
 		Byte::writeUnsigned($out, $this->emoteType->value);
+		LE::writeUnsignedLong($out, $this->blockType);
 	}
 }

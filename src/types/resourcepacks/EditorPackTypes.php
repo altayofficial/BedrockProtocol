@@ -23,13 +23,24 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types\audio;
+namespace pocketmine\network\mcpe\protocol\types\resourcepacks;
 
-use pocketmine\network\mcpe\protocol\types\PacketIntEnumTrait;
+use pocketmine\network\mcpe\protocol\ResourcePackStackPacket;
 
-enum MusicPlaybackSource : int{
-	use PacketIntEnumTrait;
+/**
+ * Bit flags for the built-in Editor packs the client adds to its stack.
+ * @see ResourcePackStackPacket
+ */
+final class EditorPackTypes{
 
-	case LOCAL = 0;
-	case ONLINE = 1;
+	private function __construct(){
+		//NOOP
+	}
+
+	public const NONE = 0;
+	public const CORE = 1 << 0;
+	public const ANNOTATION = 1 << 1;
+
+	// yeah, client rejects the packet if any other bit is set
+	public const ALL = self::CORE | self::ANNOTATION;
 }

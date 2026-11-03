@@ -43,7 +43,7 @@ final class ProtocolInfo{
 	 */
 
 	/** Actual Minecraft: PE protocol version */
-	public const CURRENT_PROTOCOL = 2238;
+	public const CURRENT_PROTOCOL = 2250;
 	/** Display version shown in the server logs. This should match the version on the game's home screen. */
 	public const MINECRAFT_VERSION = 'v26.70';
 	/** Version sent on the network for client side compatibility checks. This may differ from the display version. */
@@ -308,5 +308,7 @@ final class ProtocolInfo{
 	public const CHAT_PACKET = 0x169;
 	public const SERVERBOUND_REQUEST_ONLINE_MUSIC_PLAYBACK_PACKET = 0x16a;
 	public const CLIENTBOUND_ONLINE_MUSIC_PLAYBACK_RESPONSE_PACKET = 0x16b;
+	public const PLAYER_TOGGLE_ARMOR_VISIBILITY_REQUEST_PACKET = 0x16c;
+	public const CLIENTBOUND_MUSIC_PLAYBACK_FAILURE_PACKET = 0x16d;
 
 }

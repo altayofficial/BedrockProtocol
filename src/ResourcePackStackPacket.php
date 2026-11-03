@@ -25,11 +25,13 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol;
 
+use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\Experiments;
+use pocketmine\network\mcpe\protocol\types\resourcepacks\EditorPackTypes;
 use pocketmine\network\mcpe\protocol\types\resourcepacks\ResourcePackStackEntry;
 use function count;
 
@@ -41,19 +43,20 @@ class ResourcePackStackPacket extends DataPacket implements ClientboundPacket{
 	public bool $mustAccept = false;
 	public string $baseGameVersion = ProtocolInfo::MINECRAFT_VERSION_NETWORK;
 	public Experiments $experiments;
-	public bool $useVanillaEditorPacks;
+	/** Bitmask of EditorPackTypes flags */
+	public int $editorPackTypes = EditorPackTypes::NONE;
 
 	/**
 	 * @generate-create-func
 	 * @param ResourcePackStackEntry[] $resourcePackStack
 	 */
-	public static function create(array $resourcePackStack, bool $mustAccept, string $baseGameVersion, Experiments $experiments, bool $useVanillaEditorPacks) : self{
+	public static function create(array $resourcePackStack, bool $mustAccept, string $baseGameVersion, Experiments $experiments, int $editorPackTypes) : self{
 		$result = new self;
 		$result->resourcePackStack = $resourcePackStack;
 		$result->mustAccept = $mustAccept;
 		$result->baseGameVersion = $baseGameVersion;
 		$result->experiments = $experiments;
-		$result->useVanillaEditorPacks = $useVanillaEditorPacks;
+		$result->editorPackTypes = $editorPackTypes;
 		return $result;
 	}
 
@@ -67,7 +70,10 @@ class ResourcePackStackPacket extends DataPacket implements ClientboundPacket{
 
 		$this->baseGameVersion = CommonTypes::getString($in);
 		$this->experiments = Experiments::read($in);
-		$this->useVanillaEditorPacks = CommonTypes::getBool($in);
+		$this->editorPackTypes = Byte::readUnsigned($in);
+		if(($this->editorPackTypes & ~EditorPackTypes::ALL) !== 0){
+			throw new PacketDecodeException("Invalid editor pack types flags: $this->editorPackTypes");
+		}
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
@@ -80,7 +86,7 @@ class ResourcePackStackPacket extends DataPacket implements ClientboundPacket{
 
 		CommonTypes::putString($out, $this->baseGameVersion);
 		$this->experiments->write($out);
-		CommonTypes::putBool($out, $this->useVanillaEditorPacks);
+		Byte::writeUnsigned($out, $this->editorPackTypes);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

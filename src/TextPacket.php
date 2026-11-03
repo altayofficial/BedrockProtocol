@@ -61,6 +61,8 @@ class TextPacket extends DataPacket implements ClientboundPacket, ServerboundPac
 	public string $xboxUserId = "";
 	public string $platformChatId = "";
 	public ?string $filteredMessage = null;
+	/** Only used by translation, popup and jukebox popup. For jukebox popups, true waits behind the current popup instead of clearing the queue. */
+	public bool $queue = false;
 
 	private static function messageOnly(int $type, string $message) : self{
 		$result = new self;
@@ -108,8 +110,10 @@ class TextPacket extends DataPacket implements ClientboundPacket, ServerboundPac
 	/**
 	 * @param string[] $parameters
 	 */
-	public static function jukeboxPopup(string $key, array $parameters = []) : self{
-		return self::baseTranslation(self::TYPE_JUKEBOX_POPUP, $key, $parameters);
+	public static function jukeboxPopup(string $key, array $parameters = [], bool $queue = false) : self{
+		$result = self::baseTranslation(self::TYPE_JUKEBOX_POPUP, $key, $parameters);
+		$result->queue = $queue;
+		return $result;
 	}
 
 	public static function tip(string $message) : self{
@@ -154,6 +158,7 @@ class TextPacket extends DataPacket implements ClientboundPacket, ServerboundPac
 				for($i = 0; $i < $count; ++$i){
 					$this->parameters[] = CommonTypes::getString($in);
 				}
+				$this->queue = CommonTypes::getBool($in);
 				break;
 		}
 
@@ -209,6 +214,7 @@ class TextPacket extends DataPacket implements ClientboundPacket, ServerboundPac
 				foreach($this->parameters as $p){
 					CommonTypes::putString($out, $p);
 				}
+				CommonTypes::putBool($out, $this->queue);
 				break;
 		}
 

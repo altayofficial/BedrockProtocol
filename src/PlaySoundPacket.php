@@ -45,6 +45,8 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 	public bool $bypassListenerRangeCheck = false;
 	public ?int $serverSoundHandle = null;
 	public ?float $playbackPositionSeconds = null;
+	/** null starts playback once the audio is ready, otherwise the timeline starts after this delay and late audio seeks forward */
+	public ?float $startDelaySeconds = null;
 
 	/**
 	 * @generate-create-func
@@ -60,6 +62,7 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 		bool $bypassListenerRangeCheck,
 		?int $serverSoundHandle,
 		?float $playbackPositionSeconds,
+		?float $startDelaySeconds,
 	) : self{
 		$result = new self;
 		$result->soundName = $soundName;
@@ -72,6 +75,7 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 		$result->bypassListenerRangeCheck = $bypassListenerRangeCheck;
 		$result->serverSoundHandle = $serverSoundHandle;
 		$result->playbackPositionSeconds = $playbackPositionSeconds;
+		$result->startDelaySeconds = $startDelaySeconds;
 		return $result;
 	}
 
@@ -87,6 +91,7 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 		$this->bypassListenerRangeCheck = CommonTypes::getBool($in);
 		$this->serverSoundHandle = CommonTypes::readOptional($in, LE::readUnsignedLong(...));
 		$this->playbackPositionSeconds = CommonTypes::readOptional($in, LE::readFloat(...));
+		$this->startDelaySeconds = CommonTypes::readOptional($in, LE::readFloat(...));
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
@@ -98,6 +103,7 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 		CommonTypes::putBool($out, $this->bypassListenerRangeCheck);
 		CommonTypes::writeOptional($out, $this->serverSoundHandle, LE::writeUnsignedLong(...));
 		CommonTypes::writeOptional($out, $this->playbackPositionSeconds, LE::writeFloat(...));
+		CommonTypes::writeOptional($out, $this->startDelaySeconds, LE::writeFloat(...));
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

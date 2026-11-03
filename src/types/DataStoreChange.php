@@ -38,8 +38,7 @@ final class DataStoreChange extends DataStore {
 	public const ID = DataStoreType::CHANGE;
 
 	public function __construct(
-		private string $name,
-		private string $property,
+		private string $variableName,
 		private int $updateCount,
 		private DataStoreValue $data
 	){}
@@ -48,17 +47,14 @@ final class DataStoreChange extends DataStore {
 		return self::ID;
 	}
 
-	public function getName() : string{ return $this->name; }
-
-	public function getProperty() : string{ return $this->property; }
+	public function getVariableName() : string{ return $this->variableName; }
 
 	public function getUpdateCount() : int{ return $this->updateCount; }
 
 	public function getData() : DataStoreValue{ return $this->data; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$name = CommonTypes::getString($in);
-		$property = CommonTypes::getString($in);
+		$variableName = CommonTypes::getString($in);
 		$updateCount = VarInt::readUnsignedInt($in);
 
 		$data = match(VarInt::readUnsignedInt($in)){
@@ -69,16 +65,14 @@ final class DataStoreChange extends DataStore {
 		};
 
 		return new self(
-			$name,
-			$property,
+			$variableName,
 			$updateCount,
 			$data,
 		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->name);
-		CommonTypes::putString($out, $this->property);
+		CommonTypes::putString($out, $this->variableName);
 		VarInt::writeUnsignedInt($out, $this->updateCount);
 		VarInt::writeUnsignedInt($out, $this->data->getTypeId());
 		$this->data->write($out);
