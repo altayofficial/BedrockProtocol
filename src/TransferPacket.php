@@ -30,6 +30,7 @@ use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\GatheringJoinInfo;
+use pocketmine\network\mcpe\protocol\types\TransferPlayerUIOptions;
 
 class TransferPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::TRANSFER_PACKET;
@@ -38,16 +39,19 @@ class TransferPacket extends DataPacket implements ClientboundPacket{
 	public int $port = 19132;
 	public bool $reloadWorld;
 	public ?GatheringJoinInfo $gatheringJoinInfo = null;
+	/** Loading screen customisation for server to server transfers, ignored on world reloads */
+	public ?TransferPlayerUIOptions $uiOptions = null;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(string $address, int $port, bool $reloadWorld, ?GatheringJoinInfo $gatheringJoinInfo) : self{
+	public static function create(string $address, int $port, bool $reloadWorld, ?GatheringJoinInfo $gatheringJoinInfo, ?TransferPlayerUIOptions $uiOptions) : self{
 		$result = new self;
 		$result->address = $address;
 		$result->port = $port;
 		$result->reloadWorld = $reloadWorld;
 		$result->gatheringJoinInfo = $gatheringJoinInfo;
+		$result->uiOptions = $uiOptions;
 		return $result;
 	}
 
@@ -56,6 +60,7 @@ class TransferPacket extends DataPacket implements ClientboundPacket{
 		$this->port = LE::readUnsignedShort($in);
 		$this->reloadWorld = CommonTypes::getBool($in);
 		$this->gatheringJoinInfo = CommonTypes::readOptional($in, GatheringJoinInfo::read(...));
+		$this->uiOptions = CommonTypes::readOptional($in, TransferPlayerUIOptions::read(...));
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
@@ -63,6 +68,7 @@ class TransferPacket extends DataPacket implements ClientboundPacket{
 		LE::writeUnsignedShort($out, $this->port);
 		CommonTypes::putBool($out, $this->reloadWorld);
 		CommonTypes::writeOptional($out, $this->gatheringJoinInfo, fn(ByteBufferWriter $out, GatheringJoinInfo $info) => $info->write($out));
+		CommonTypes::writeOptional($out, $this->uiOptions, fn(ByteBufferWriter $out, TransferPlayerUIOptions $options) => $options->write($out));
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

@@ -29,24 +29,24 @@ use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
-use pocketmine\network\mcpe\protocol\types\audio\MusicPlaybackSource;
+use pocketmine\network\mcpe\protocol\types\audio\MusicPlaybackState;
 use pocketmine\network\mcpe\protocol\types\audio\SignedAudioContent;
 
 class ClientboundOnlineMusicPlaybackResponsePacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::CLIENTBOUND_ONLINE_MUSIC_PLAYBACK_RESPONSE_PACKET;
 
 	private int $requestId;
-	private MusicPlaybackSource $source;
+	private MusicPlaybackState $state;
 	private SignedAudioContent $sharedMetadata;
 	private SignedAudioContent $playbackContent;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(int $requestId, MusicPlaybackSource $source, SignedAudioContent $sharedMetadata, SignedAudioContent $playbackContent) : self{
+	public static function create(int $requestId, MusicPlaybackState $state, SignedAudioContent $sharedMetadata, SignedAudioContent $playbackContent) : self{
 		$result = new self;
 		$result->requestId = $requestId;
-		$result->source = $source;
+		$result->state = $state;
 		$result->sharedMetadata = $sharedMetadata;
 		$result->playbackContent = $playbackContent;
 		return $result;
@@ -57,7 +57,7 @@ class ClientboundOnlineMusicPlaybackResponsePacket extends DataPacket implements
 	 */
 	public function getRequestId() : int{ return $this->requestId; }
 
-	public function getSource() : MusicPlaybackSource{ return $this->source; }
+	public function getState() : MusicPlaybackState{ return $this->state; }
 
 	public function getSharedMetadata() : SignedAudioContent{ return $this->sharedMetadata; }
 
@@ -65,14 +65,14 @@ class ClientboundOnlineMusicPlaybackResponsePacket extends DataPacket implements
 
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$this->requestId = LE::readUnsignedInt($in);
-		$this->source = MusicPlaybackSource::fromPacket(Byte::readUnsigned($in));
+		$this->state = MusicPlaybackState::fromPacket(Byte::readUnsigned($in));
 		$this->sharedMetadata = SignedAudioContent::read($in);
 		$this->playbackContent = SignedAudioContent::read($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
 		LE::writeUnsignedInt($out, $this->requestId);
-		Byte::writeUnsigned($out, $this->source->value);
+		Byte::writeUnsigned($out, $this->state->value);
 		$this->sharedMetadata->write($out);
 		$this->playbackContent->write($out);
 	}
