@@ -34,10 +34,6 @@ use pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper;
 use function count;
 use function strlen;
 
-/**
- * Opens a container screen onto a virtual container, one that only lives in memory with no block or entity behind it.
- * The slot count is the container size, so no InventoryContentPacket follows, and the client never acks a successful open.
- */
 class VirtualContainerOpenPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::VIRTUAL_CONTAINER_OPEN_PACKET;
 
@@ -66,10 +62,8 @@ class VirtualContainerOpenPacket extends DataPacket implements ClientboundPacket
 
 	public function getWindowId() : int{ return $this->windowId; }
 
-	/** Nonzero id every VirtualContainerClosePacket for this screen refers back to */
 	public function getSessionId() : int{ return $this->sessionId; }
 
-	/** Localized on the client when it's a localization key */
 	public function getTitle() : string{ return $this->title; }
 
 	/** @return ItemStackWrapper[] */

@@ -54,10 +54,6 @@ class ChatPacket extends DataPacket implements ClientboundPacket, ServerboundPac
 
 	public function getSignedChat() : SignedChat{ return $this->signedChat; }
 
-	/**
-	 * Chat room the message goes to, null for the default chat. It sits outside the signed block, so the server
-	 * is free to rewrite it to route the message somewhere else.
-	 */
 	public function getRoomId() : ?string{ return $this->roomId; }
 
 	public function getFormatting() : ?ChatFormatting{ return $this->formatting; }

@@ -32,10 +32,6 @@ use pmmp\encoding\VarInt;
 use pocketmine\network\mcpe\protocol\types\inventory\VirtualContainerCloseCause;
 use pocketmine\network\mcpe\protocol\types\inventory\VirtualContainerCloseKind;
 
-/**
- * Closes a virtual container screen opened by VirtualContainerOpenPacket. Goes both ways: the server requests and
- * confirms, the client reports the screen as closed. ContainerClosePacket isn't involved here.
- */
 class VirtualContainerClosePacket extends DataPacket implements ClientboundPacket, ServerboundPacket{
 	public const NETWORK_ID = ProtocolInfo::VIRTUAL_CONTAINER_CLOSE_PACKET;
 
@@ -58,7 +54,6 @@ class VirtualContainerClosePacket extends DataPacket implements ClientboundPacke
 
 	public function getKind() : VirtualContainerCloseKind{ return $this->kind; }
 
-	/** Request carries SERVER_REQUESTED and Confirmed carries UNKNOWN */
 	public function getCause() : VirtualContainerCloseCause{ return $this->cause; }
 
 	protected function decodePayload(ByteBufferReader $in) : void{

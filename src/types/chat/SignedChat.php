@@ -54,7 +54,6 @@ final class SignedChat{
 
 	public function getRedactedText() : string{ return $this->redactedText; }
 
-	/** Covered by the signature, so relay it untouched */
 	public function getAuthorName() : string{ return $this->authorName; }
 
 	public function getSignature() : string{ return $this->signature; }

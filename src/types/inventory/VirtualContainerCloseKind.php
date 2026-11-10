@@ -30,10 +30,7 @@ use pocketmine\network\mcpe\protocol\types\PacketIntEnumTrait;
 enum VirtualContainerCloseKind : int{
 	use PacketIntEnumTrait;
 
-	// server asks the client to close the screen
 	case REQUEST = 0;
-	// client reports its screen closed, or that it couldn't show it
 	case CLOSED = 1;
-	// server confirms once the player's queued inventory requests are done
 	case CONFIRMED = 2;
 }

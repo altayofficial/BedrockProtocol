@@ -47,7 +47,6 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 	public ?float $playbackPositionSeconds = null;
 	/** null starts playback once the audio is ready, otherwise the timeline starts after this delay and late audio seeks forward */
 	public ?float $startDelaySeconds = null;
-	/** runtime id of the entity the sound follows, null keeps it at the given position */
 	public ?int $attachToActorRuntimeId = null;
 
 	/**
@@ -96,7 +95,6 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 		$this->serverSoundHandle = CommonTypes::readOptional($in, LE::readUnsignedLong(...));
 		$this->playbackPositionSeconds = CommonTypes::readOptional($in, LE::readFloat(...));
 		$this->startDelaySeconds = CommonTypes::readOptional($in, LE::readFloat(...));
-		// hmm, on the wire this is an optional SoundAttachOptions, but it only wraps the runtime id
 		$this->attachToActorRuntimeId = CommonTypes::readOptional($in, CommonTypes::getActorRuntimeId(...));
 	}
 

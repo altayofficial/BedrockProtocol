@@ -62,7 +62,6 @@ final class PassengerOfBlockArguments{
 	/** Hashed serialized id of the block the passenger is sitting on */
 	public function getBlockType() : int{ return $this->blockType; }
 
-	/** Behavior pack that started the passenger of block */
 	public function getPackUuid() : UuidInterface{ return $this->packUuid; }
 
 	public static function read(ByteBufferReader $in) : self{

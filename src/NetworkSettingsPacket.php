@@ -92,7 +92,6 @@ class NetworkSettingsPacket extends DataPacket implements ClientboundPacket{
 		$this->enableClientThrottling = CommonTypes::getBool($in);
 		$this->clientThrottleThreshold = Byte::readUnsigned($in);
 		$this->clientThrottleScalar = LE::readFloat($in);
-		// client rejects the packet on unknown values, so we do too
 		$this->sctpRecoveryProfile = SctpRecoveryProfile::fromPacket(Byte::readUnsigned($in));
 	}
 

@@ -25,14 +25,10 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types;
 
-/**
- * Tells the client how eagerly to retry lost data, applied live without reconnecting.
- */
 enum SctpRecoveryProfile : int{
 	use PacketIntEnumTrait;
 
 	case DEFAULT = 0;
-	// yeah, the wire values aren't in the order you'd expect
 	case FAST = 1;
 	case BALANCED = 2;
 }
