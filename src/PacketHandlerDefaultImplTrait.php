@@ -1000,4 +1000,12 @@ trait PacketHandlerDefaultImplTrait{
 	public function handleClientboundMusicPlaybackFailure(ClientboundMusicPlaybackFailurePacket $packet) : bool{
 		return false;
 	}
+
+	public function handleVirtualContainerOpen(VirtualContainerOpenPacket $packet) : bool{
+		return false;
+	}
+
+	public function handleVirtualContainerClose(VirtualContainerClosePacket $packet) : bool{
+		return false;
+	}
 }

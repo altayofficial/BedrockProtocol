@@ -185,4 +185,6 @@ enum DisconnectReason : int {
 	case SESSION_THROTTLED = 156;
 	case SESSION_REQUEST_REJECTED = 157;
 	case SESSION_UNKNOWN_ERROR = 158;
+	// malformed incoming data, or a batch over the decompression limit
+	case BROKEN_DATA = 159;
 }

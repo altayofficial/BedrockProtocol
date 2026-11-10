@@ -38,29 +38,39 @@ class ChatPacket extends DataPacket implements ClientboundPacket, ServerboundPac
 	public const NETWORK_ID = ProtocolInfo::CHAT_PACKET;
 
 	private SignedChat $signedChat;
+	private ?string $roomId;
 	private ?ChatFormatting $formatting;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(SignedChat $signedChat, ?ChatFormatting $formatting) : self{
+	public static function create(SignedChat $signedChat, ?string $roomId, ?ChatFormatting $formatting) : self{
 		$result = new self;
 		$result->signedChat = $signedChat;
+		$result->roomId = $roomId;
 		$result->formatting = $formatting;
 		return $result;
 	}
 
 	public function getSignedChat() : SignedChat{ return $this->signedChat; }
 
+	/**
+	 * Chat room the message goes to, null for the default chat. It sits outside the signed block, so the server
+	 * is free to rewrite it to route the message somewhere else.
+	 */
+	public function getRoomId() : ?string{ return $this->roomId; }
+
 	public function getFormatting() : ?ChatFormatting{ return $this->formatting; }
 
 	protected function decodePayload(ByteBufferReader $in) : void{
 		$this->signedChat = SignedChat::read($in);
+		$this->roomId = CommonTypes::readOptional($in, CommonTypes::getString(...));
 		$this->formatting = CommonTypes::readOptional($in, ChatFormatting::read(...));
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
 		$this->signedChat->write($out);
+		CommonTypes::writeOptional($out, $this->roomId, CommonTypes::putString(...));
 		CommonTypes::writeOptional($out, $this->formatting, fn(ByteBufferWriter $out, ChatFormatting $v) => $v->write($out));
 	}
 

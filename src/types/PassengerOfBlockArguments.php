@@ -32,6 +32,7 @@ use pmmp\encoding\LE;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\SetPassengerOfBlockPacket;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * @see SetPassengerOfBlockPacket
@@ -44,7 +45,8 @@ final class PassengerOfBlockArguments{
 		private float $rotation,
 		private float $rotationLimit,
 		private PassengerOfBlockEmoteType $emoteType,
-		private int $blockType
+		private int $blockType,
+		private UuidInterface $packUuid
 	){}
 
 	public function getBlockPosition() : BlockPosition{ return $this->blockPosition; }
@@ -60,6 +62,9 @@ final class PassengerOfBlockArguments{
 	/** Hashed serialized id of the block the passenger is sitting on */
 	public function getBlockType() : int{ return $this->blockType; }
 
+	/** Behavior pack that started the passenger of block */
+	public function getPackUuid() : UuidInterface{ return $this->packUuid; }
+
 	public static function read(ByteBufferReader $in) : self{
 		$blockPosition = CommonTypes::getBlockPosition($in);
 		$offset = CommonTypes::getVector3($in);
@@ -67,6 +72,7 @@ final class PassengerOfBlockArguments{
 		$rotationLimit = LE::readFloat($in);
 		$emoteType = PassengerOfBlockEmoteType::fromPacket(Byte::readUnsigned($in));
 		$blockType = LE::readUnsignedLong($in);
+		$packUuid = CommonTypes::getUUID($in);
 
 		return new self(
 			$blockPosition,
@@ -74,7 +80,8 @@ final class PassengerOfBlockArguments{
 			$rotation,
 			$rotationLimit,
 			$emoteType,
-			$blockType
+			$blockType,
+			$packUuid
 		);
 	}
 
@@ -85,5 +92,6 @@ final class PassengerOfBlockArguments{
 		LE::writeFloat($out, $this->rotationLimit);
 		Byte::writeUnsigned($out, $this->emoteType->value);
 		LE::writeUnsignedLong($out, $this->blockType);
+		CommonTypes::putUUID($out, $this->packUuid);
 	}
 }

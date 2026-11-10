@@ -47,6 +47,8 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 	public ?float $playbackPositionSeconds = null;
 	/** null starts playback once the audio is ready, otherwise the timeline starts after this delay and late audio seeks forward */
 	public ?float $startDelaySeconds = null;
+	/** runtime id of the entity the sound follows, null keeps it at the given position */
+	public ?int $attachToActorRuntimeId = null;
 
 	/**
 	 * @generate-create-func
@@ -63,6 +65,7 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 		?int $serverSoundHandle,
 		?float $playbackPositionSeconds,
 		?float $startDelaySeconds,
+		?int $attachToActorRuntimeId,
 	) : self{
 		$result = new self;
 		$result->soundName = $soundName;
@@ -76,6 +79,7 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 		$result->serverSoundHandle = $serverSoundHandle;
 		$result->playbackPositionSeconds = $playbackPositionSeconds;
 		$result->startDelaySeconds = $startDelaySeconds;
+		$result->attachToActorRuntimeId = $attachToActorRuntimeId;
 		return $result;
 	}
 
@@ -92,6 +96,8 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 		$this->serverSoundHandle = CommonTypes::readOptional($in, LE::readUnsignedLong(...));
 		$this->playbackPositionSeconds = CommonTypes::readOptional($in, LE::readFloat(...));
 		$this->startDelaySeconds = CommonTypes::readOptional($in, LE::readFloat(...));
+		// hmm, on the wire this is an optional SoundAttachOptions, but it only wraps the runtime id
+		$this->attachToActorRuntimeId = CommonTypes::readOptional($in, CommonTypes::getActorRuntimeId(...));
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
@@ -104,6 +110,7 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 		CommonTypes::writeOptional($out, $this->serverSoundHandle, LE::writeUnsignedLong(...));
 		CommonTypes::writeOptional($out, $this->playbackPositionSeconds, LE::writeFloat(...));
 		CommonTypes::writeOptional($out, $this->startDelaySeconds, LE::writeFloat(...));
+		CommonTypes::writeOptional($out, $this->attachToActorRuntimeId, CommonTypes::putActorRuntimeId(...));
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{
