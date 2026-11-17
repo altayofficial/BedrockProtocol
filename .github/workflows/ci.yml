@@ -21,6 +21,8 @@ jobs:
           extensions: encoding-pmmp/ext-encoding@1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # hmm, setup-php does cd "$sub_dir" and bash 5.3 rejects the empty default, so point it at the repo root
+          ENCODING_PATH: .
 
       - name: Load Composer package cache
         uses: actions/cache@v4
@@ -55,6 +57,8 @@ jobs:
           extensions: encoding-pmmp/ext-encoding@1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # hmm, setup-php does cd "$sub_dir" and bash 5.3 rejects the empty default, so point it at the repo root
+          ENCODING_PATH: .
 
       - name: Load Composer package cache
         uses: actions/cache@v4
