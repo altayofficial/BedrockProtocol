@@ -43,11 +43,11 @@ final class ProtocolInfo{
 	 */
 
 	/** Actual Minecraft: PE protocol version */
-	public const CURRENT_PROTOCOL = 2225;
+	public const CURRENT_PROTOCOL = 2259;
 	/** Display version shown in the server logs. This should match the version on the game's home screen. */
-	public const MINECRAFT_VERSION = 'v26.60';
+	public const MINECRAFT_VERSION = 'v26.70';
 	/** Version sent on the network for client side compatibility checks. This may differ from the display version. */
-	public const MINECRAFT_VERSION_NETWORK = '1.26.60';
+	public const MINECRAFT_VERSION_NETWORK = '1.26.70';
 
 	public const LOGIN_PACKET = 0x01;
 	public const PLAY_STATUS_PACKET = 0x02;
@@ -210,8 +210,7 @@ final class ProtocolInfo{
 
 	public const CLIENTBOUND_DEBUG_RENDERER_PACKET = 0xa4;
 	public const SYNC_ACTOR_PROPERTY_PACKET = 0xa5;
-	public const ADD_VOLUME_ENTITY_PACKET = 0xa6;
-	public const REMOVE_VOLUME_ENTITY_PACKET = 0xa7;
+
 	public const SIMULATION_TYPE_PACKET = 0xa8;
 	public const NPC_DIALOGUE_PACKET = 0xa9;
 	public const EDU_URI_RESOURCE_PACKET = 0xaa;
@@ -306,5 +305,12 @@ final class ProtocolInfo{
 	public const SERVERBOUND_CURSOR_ITEM_DRAG_PACKET = 0x166;
 	public const CLIENTBOUND_PLAY_AUDIO_CONTENT_PACKET = 0x167;
 	public const SERVERBOUND_REGISTER_AUDIO_CONTENT_PACKET = 0x168;
+	public const CHAT_PACKET = 0x169;
+	public const SERVERBOUND_REQUEST_ONLINE_MUSIC_PLAYBACK_PACKET = 0x16a;
+	public const CLIENTBOUND_ONLINE_MUSIC_PLAYBACK_RESPONSE_PACKET = 0x16b;
+	public const PLAYER_TOGGLE_ARMOR_VISIBILITY_REQUEST_PACKET = 0x16c;
+	public const CLIENTBOUND_MUSIC_PLAYBACK_FAILURE_PACKET = 0x16d;
+	public const VIRTUAL_CONTAINER_OPEN_PACKET = 0x16e;
+	public const VIRTUAL_CONTAINER_CLOSE_PACKET = 0x16f;
 
 }

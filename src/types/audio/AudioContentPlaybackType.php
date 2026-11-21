@@ -30,6 +30,7 @@ use pocketmine\network\mcpe\protocol\PacketDecodeException;
 enum AudioContentPlaybackType : string{
 	case MUSIC = "Music";
 	case SOUND = "Sound";
+	case CONCURRENT_MUSIC = "ConcurrentMusic";
 
 	/**
 	 * @throws PacketDecodeException

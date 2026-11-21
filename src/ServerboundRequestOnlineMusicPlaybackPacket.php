@@ -27,39 +27,40 @@ namespace pocketmine\network\mcpe\protocol;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\VarInt;
+use pmmp\encoding\LE;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
-class RemoveVolumeEntityPacket extends DataPacket implements ClientboundPacket{
-	public const NETWORK_ID = ProtocolInfo::REMOVE_VOLUME_ENTITY_PACKET;
+class ServerboundRequestOnlineMusicPlaybackPacket extends DataPacket implements ServerboundPacket{
+	public const NETWORK_ID = ProtocolInfo::SERVERBOUND_REQUEST_ONLINE_MUSIC_PLAYBACK_PACKET;
 
-	private int $entityNetId;
-	private int $dimension;
+	private int $requestId;
+	private string $soundEventName;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(int $entityNetId, int $dimension) : self{
+	public static function create(int $requestId, string $soundEventName) : self{
 		$result = new self;
-		$result->entityNetId = $entityNetId;
-		$result->dimension = $dimension;
+		$result->requestId = $requestId;
+		$result->soundEventName = $soundEventName;
 		return $result;
 	}
 
-	public function getEntityNetId() : int{ return $this->entityNetId; }
+	public function getRequestId() : int{ return $this->requestId; }
 
-	public function getDimension() : int{ return $this->dimension; }
+	public function getSoundEventName() : string{ return $this->soundEventName; }
 
 	protected function decodePayload(ByteBufferReader $in) : void{
-		$this->entityNetId = VarInt::readUnsignedInt($in);
-		$this->dimension = VarInt::readSignedInt($in);
+		$this->requestId = LE::readUnsignedInt($in);
+		$this->soundEventName = CommonTypes::getString($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out) : void{
-		VarInt::writeUnsignedInt($out, $this->entityNetId);
-		VarInt::writeSignedInt($out, $this->dimension);
+		LE::writeUnsignedInt($out, $this->requestId);
+		CommonTypes::putString($out, $this->soundEventName);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{
-		return $handler->handleRemoveVolumeEntity($this);
+		return $handler->handleServerboundRequestOnlineMusicPlayback($this);
 	}
 }

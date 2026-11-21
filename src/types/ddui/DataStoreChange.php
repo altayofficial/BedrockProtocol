@@ -42,39 +42,33 @@ final class DataStoreChange implements DataStoreOperation{
 	public const ID = DataStoreOperationType::CHANGE;
 
 	public function __construct(
-		private string $name,
-		private string $property,
+		private string $variableName,
 		private int $updateCount,
 		private ?DynamicValue $data
 	){}
 
-	public function getName() : string{ return $this->name; }
-
-	public function getProperty() : string{ return $this->property; }
+	public function getVariableName() : string{ return $this->variableName; }
 
 	public function getUpdateCount() : int{ return $this->updateCount; }
 
 	public function getData() : ?DynamicValue{ return $this->data; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$name = CommonTypes::getString($in);
-		$property = CommonTypes::getString($in);
+		$variableName = CommonTypes::getString($in);
 		$updateCount = LE::readUnsignedInt($in);
 
 		$type = LE::readUnsignedInt($in);
 		$data = DynamicValue::read($in, $type);
 
 		return new self(
-			$name,
-			$property,
+			$variableName,
 			$updateCount,
 			$data,
 		);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->name);
-		CommonTypes::putString($out, $this->property);
+		CommonTypes::putString($out, $this->variableName);
 		LE::writeUnsignedInt($out, $this->updateCount);
 
 		//TODO: yucky, we really need to revamp how unions are handled :(

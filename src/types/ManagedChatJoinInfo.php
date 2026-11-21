@@ -23,39 +23,29 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types\inventory\stackrequest;
+namespace pocketmine\network\mcpe\protocol\types;
 
-use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
-use pocketmine\network\mcpe\protocol\types\GetTypeIdFromConstTrait;
 
 /**
- * Placeholder action Mojang shipped ahead of whatever feature it's meant for.
+ * @see ServerJoinInformation
  */
-final class ReservedStackRequestAction extends ItemStackRequestAction{
-	use GetTypeIdFromConstTrait;
-
-	public const ID = ItemStackRequestActionType::CRAFTING_RESERVED;
-
+final class ManagedChatJoinInfo{
 	public function __construct(
-		private string $reservedId,
-		private int $numCrafts
+		private ?bool $enabled
 	){}
 
-	public function getReservedId() : string{ return $this->reservedId; }
-
-	public function getNumCrafts() : int{ return $this->numCrafts; }
+	public function isEnabled() : ?bool{ return $this->enabled; }
 
 	public static function read(ByteBufferReader $in) : self{
-		$reservedId = CommonTypes::getString($in);
-		$numCrafts = Byte::readUnsigned($in);
-		return new self($reservedId, $numCrafts);
+		$enabled = CommonTypes::readOptional($in, CommonTypes::getBool(...));
+
+		return new self($enabled);
 	}
 
 	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::putString($out, $this->reservedId);
-		Byte::writeUnsigned($out, $this->numCrafts);
+		CommonTypes::writeOptional($out, $this->enabled, CommonTypes::putBool(...));
 	}
 }

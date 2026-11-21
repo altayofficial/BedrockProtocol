@@ -56,8 +56,8 @@ class ClientboundDataStorePacketTest extends TestCase{
 			"nothing" => null,
 		]);
 		$pk = ClientboundDataStorePacket::create([
-			new DataStoreChange("minecraft", "custom_form_data_0", 3, $tree),
-			new DataStoreUpdate("minecraft", "custom_form_data_0", "layout.first.label", new StringDataStoreUpdateValue("x"), 4, 5),
+			new DataStoreChange("custom_form_data_0", 3, $tree),
+			new DataStoreUpdate("custom_form_data_0", new StringDataStoreUpdateValue("x"), 4),
 			new DataStoreRemoval("minecraft"),
 		]);
 
